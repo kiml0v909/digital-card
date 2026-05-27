@@ -2,753 +2,452 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>순천향 미랩 · Digital Card</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
-<!-- Lucide icons via CDN -->
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-  --gold: #c8b89a;
-  --gd: rgba(200,184,154,0.45);
-  --gf: rgba(200,184,154,0.08);
-  --bg: #070707;
-  --border: rgba(200,184,154,0.09);
-  --text: #f0e8dc;
-  --text-dim: rgba(240,232,220,0.55);
-}
-
-html, body { min-height: 100%; overflow-x: hidden; }
-body {
-  background: var(--bg);
-  color: var(--text);
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  color: #f0e8dc;
   font-family: 'Josefin Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+.app {
+  width: 100vw; height: 100vh; height: 100dvh;
+  display: flex; flex-direction: column;
+}
 
-/* ── NAV ── */
+/* NAV */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0;
+  flex-shrink: 0;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 18px 28px;
-  z-index: 100;
-  background: rgba(7,7,7,0.94);
-  backdrop-filter: blur(20px);
-  border-bottom: 0.5px solid var(--border);
+  padding: 14px 22px;
+  padding-top: max(14px, env(safe-area-inset-top));
+  background: #000;
+  border-bottom: 0.5px solid rgba(200,184,154,0.12);
 }
-.nlogo {
-  font-size: 11px;
-  letter-spacing: 5px;
-  color: rgba(200,184,154,0.5);
-  font-weight: 200;
-}
-.ntabs {
-  display: flex; gap: 2px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 24px;
-  padding: 3px;
-}
+.nlogo { font-size: 10px; letter-spacing: 5px; color: rgba(200,184,154,0.4); font-weight: 200; }
+.ntabs { display: flex; gap: 2px; background: rgba(255,255,255,0.04); border-radius: 24px; padding: 3px; }
 .ntab {
   font-family: 'Josefin Sans', sans-serif;
-  font-size: 8px;
-  letter-spacing: 2.5px;
-  padding: 8px 16px;
-  border: none; border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.25s;
-  background: transparent;
-  color: rgba(200,184,154,0.35);
-  font-weight: 300;
+  font-size: 8px; letter-spacing: 2px; padding: 7px 14px;
+  border: none; border-radius: 20px; cursor: pointer;
+  background: transparent; color: rgba(200,184,154,0.3); font-weight: 300; transition: all 0.22s;
 }
-.ntab.on {
-  background: rgba(200,184,154,0.11);
-  color: var(--gold);
+.ntab.on { background: rgba(200,184,154,0.12); color: #c8b89a; }
+
+/* PAGES */
+.pages { flex: 1; position: relative; overflow: hidden; }
+.page {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+  background: #000;
+}
+.page.on { opacity: 1; pointer-events: all; }
+
+/* ════════════════════════════════
+   CARD PAGE — 명함이 화면 전체
+════════════════════════════════ */
+#pg-card {
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(12px, 3vw, 32px);
 }
 
-/* ── PAGES ── */
-.page { display: none; padding-top: 68px; min-height: 100vh; animation: pin 0.45s ease; }
-.page.on { display: block; }
-@keyframes pin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.card-outer {
+  width: 100%;
+  max-width: min(96vw, calc((100dvh - 80px) * 1.78));
+  aspect-ratio: 1.78 / 1;
+}
 
-/* ── HERO ── */
-.hero {
+/* 명함 본체 — 순수 #000 */
+.biz {
+  width: 100%; height: 100%;
+  background: #000000;
+  border: 0.5px solid rgba(255,255,255,0.06);
+  border-radius: clamp(6px, 1.2vw, 14px);
   position: relative;
-  min-height: 440px;
-  display: flex; align-items: flex-end;
-  padding: 64px 36px 52px;
-  overflow: hidden;
-}
-.hbg {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at 80% 10%, rgba(200,184,154,0.05) 0%, transparent 50%),
-    linear-gradient(175deg, #161616 0%, #0a0a0a 40%, var(--bg) 100%);
-}
-.hlv {
-  position: absolute; left: 36px; top: 48px; bottom: 48px;
-  width: 1px;
-  background: linear-gradient(180deg, transparent 0%, rgba(200,184,154,0.5) 40%, rgba(200,184,154,0.2) 100%);
-}
-.hc { position: relative; z-index: 1; padding-left: 22px; }
-
-.hey {
-  font-size: 8px;
-  letter-spacing: 7px;
-  color: rgba(200,184,154,0.3);
-  margin-bottom: 16px;
-  font-weight: 200;
-  animation: fu 0.9s 0.1s both;
-}
-.hname {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 56px;
-  font-weight: 300;
-  line-height: 1.0;
-  letter-spacing: 3px;
-  color: var(--text);
-  animation: fu 0.9s 0.2s both;
-}
-.hrole {
-  font-size: 9px;
-  letter-spacing: 5px;
-  color: rgba(200,184,154,0.4);
-  margin-top: 18px;
-  font-weight: 200;
-  animation: fu 0.9s 0.3s both;
-}
-@keyframes fu { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── SECTIONS ── */
-.sec {
-  padding: 52px 36px;
-  border-top: 0.5px solid var(--border);
-}
-.sec-label {
-  font-size: 8px;
-  letter-spacing: 6px;
-  color: rgba(200,184,154,0.28);
-  margin-bottom: 10px;
-  font-weight: 200;
-}
-.sec-line {
-  width: 20px; height: 1px;
-  background: rgba(200,184,154,0.45);
-  margin-bottom: 28px;
+  padding: clamp(20px, 5vw, 56px);
+  display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.04);
 }
 
-/* ── ABOUT ── */
-.about-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 21px;
-  font-weight: 300;
-  font-style: italic;
-  line-height: 2.0;
-  color: rgba(240,232,220,0.55);
-  max-width: 400px;
-  letter-spacing: 0.3px;
-}
+/* 상단: 이름 크게 */
+.biz-top { display: flex; flex-direction: column; }
 
-/* ── CONTACT LIST ── */
-.clist { display: flex; flex-direction: column; }
-.crow {
-  display: flex; align-items: center; gap: 20px;
-  padding: 22px 0;
-  border-bottom: 0.5px solid var(--border);
-  text-decoration: none; color: inherit;
-  transition: padding-left 0.22s, opacity 0.22s;
-  cursor: pointer;
-}
-.crow:hover { padding-left: 8px; opacity: 0.8; }
-.crow:last-child { border-bottom: none; }
-.cicn {
-  width: 38px; height: 38px;
-  border: 0.5px solid rgba(200,184,154,0.14);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  color: rgba(200,184,154,0.45);
-}
-.cicn svg { width: 15px; height: 15px; stroke-width: 1.5; }
-.cinfo { flex: 1; }
-.clabel {
-  font-size: 8px;
-  letter-spacing: 3.5px;
-  color: rgba(200,184,154,0.28);
-  margin-bottom: 5px;
-  font-weight: 200;
-}
-.cval {
-  font-size: 12px;
-  letter-spacing: 1.5px;
-  color: rgba(200,184,154,0.65);
-  font-weight: 300;
-}
-
-/* ── SAVE BUTTON ── */
-.savebtn {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  width: 100%; padding: 18px;
-  background: transparent;
-  border: 0.5px solid rgba(200,184,154,0.22);
-  border-radius: 10px;
-  font-family: 'Josefin Sans', sans-serif;
-  font-size: 9px; letter-spacing: 4px;
-  color: rgba(200,184,154,0.45);
-  cursor: pointer; transition: all 0.25s;
-  font-weight: 300;
-}
-.savebtn svg { width: 13px; height: 13px; stroke-width: 1.5; }
-.savebtn:hover, .savebtn:active {
-  background: rgba(200,184,154,0.04);
-  color: var(--gold);
-  border-color: rgba(200,184,154,0.38);
-}
-
-/* ── MUSIC PLAYER ── */
-.pcard {
-  background: rgba(255,255,255,0.018);
-  border: 0.5px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 20px;
-}
-.art {
-  width: 100%; aspect-ratio: 16/9;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #181818, #0d0d0d);
-  margin-bottom: 20px;
-  display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden; cursor: pointer;
-}
-.art-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.art-lbl {
-  position: absolute; bottom: 14px; left: 16px;
-  font-size: 8px; letter-spacing: 4px;
-  color: rgba(200,184,154,0.3);
-  pointer-events: none;
-  font-weight: 200;
-}
-.art-hint {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; letter-spacing: 3px;
-  color: rgba(200,184,154,0.25);
-  pointer-events: none; transition: opacity 0.3s;
-}
-.tname {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px; font-weight: 400;
-  color: var(--text); margin-bottom: 4px;
-  letter-spacing: 0.5px;
-}
-.tartist {
-  font-size: 9px; letter-spacing: 3px;
-  color: rgba(200,184,154,0.3);
-  margin-bottom: 22px; font-weight: 200;
-}
-.prog {
-  width: 100%; height: 1.5px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 1px; cursor: pointer;
-  position: relative; margin-bottom: 6px;
-}
-.pfill {
-  height: 100%; background: var(--gold);
-  border-radius: 1px; position: relative;
-  transition: width 0.08s linear;
-}
-.pdot {
-  width: 10px; height: 10px;
-  background: var(--gold); border-radius: 50%;
-  position: absolute; right: -5px; top: -4.5px;
-}
-.trow {
-  display: flex; justify-content: space-between;
-  font-size: 8px; letter-spacing: 1px;
-  color: rgba(200,184,154,0.22);
-  margin-bottom: 24px;
-}
-.ctrls {
-  display: flex; align-items: center; justify-content: center; gap: 24px;
-}
-.cb {
-  background: none; border: none; cursor: pointer;
-  color: rgba(200,184,154,0.3); transition: color 0.2s; padding: 6px;
-  display: flex; align-items: center; justify-content: center;
-}
-.cb svg { width: 18px; height: 18px; stroke-width: 1.5; }
-.cb:hover { color: var(--gold); }
-.pb {
-  width: 54px; height: 54px;
-  border: 1px solid rgba(200,184,154,0.4);
-  border-radius: 50%; background: transparent; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--gold); transition: all 0.25s;
-}
-.pb svg { width: 18px; height: 18px; stroke-width: 1.5; }
-.pb:hover, .pb:active { background: rgba(200,184,154,0.08); }
-.vol-row {
-  display: flex; align-items: center; gap: 12px;
-  margin-top: 20px; padding-top: 16px;
-  border-top: 0.5px solid var(--border);
-}
-.vol-icn { color: rgba(200,184,154,0.28); display: flex; }
-.vol-icn svg { width: 14px; height: 14px; stroke-width: 1.5; }
-input[type=range].vol {
-  -webkit-appearance: none; flex: 1;
-  height: 1.5px; background: rgba(255,255,255,0.06);
-  border-radius: 1px; outline: none; border: none; padding: 0; cursor: pointer;
-}
-input[type=range].vol::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 12px; height: 12px;
-  border-radius: 50%; background: var(--gold); cursor: pointer;
-}
-
-/* ── PLAYLIST ── */
-.plist { display: flex; flex-direction: column; gap: 2px; }
-.pli {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 12px; border-radius: 10px;
-  cursor: pointer; transition: background 0.18s;
-}
-.pli:hover { background: rgba(255,255,255,0.02); }
-.pli.on { background: rgba(200,184,154,0.05); }
-.pthumb {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, #222, #161616);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  color: rgba(200,184,154,0.18);
-}
-.pthumb svg { width: 14px; height: 14px; stroke-width: 1.2; }
-.pinfo { flex: 1; }
-.ptitle {
-  font-size: 11px; letter-spacing: 1.5px;
-  color: rgba(240,232,220,0.75); margin-bottom: 4px;
-  font-weight: 300;
-}
-.psub { font-size: 8px; letter-spacing: 2px; color: rgba(200,184,154,0.28); font-weight: 200; }
-.pact { color: rgba(200,184,154,0.22); display: flex; }
-.pact svg { width: 14px; height: 14px; stroke-width: 1.5; }
-.pli.on .pact { color: var(--gold); }
-.mood-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 7px 16px;
-  background: rgba(200,184,154,0.05);
-  border: 0.5px solid rgba(200,184,154,0.13);
-  border-radius: 20px;
-  font-size: 9px; letter-spacing: 2.5px;
-  color: rgba(200,184,154,0.45);
-  margin-bottom: 22px; font-weight: 200;
-}
-.mood-badge svg { width: 12px; height: 12px; stroke-width: 1.5; }
-
-/* ── CARD PAGE ── */
-.cardsec {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 52px 28px 72px;
-}
-.biz-front {
-  width: 100%; max-width: 340px;
-  background: linear-gradient(140deg, #1e1e1e 0%, #111 100%);
-  border: 0.5px solid rgba(200,184,154,0.07);
-  border-radius: 16px; padding: 32px 28px;
-  aspect-ratio: 1.75; display: flex; flex-direction: column; justify-content: flex-end;
-  margin-bottom: 12px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-}
 .biz-name {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 22px; font-weight: 300; letter-spacing: 3px;
-  color: var(--text); line-height: 1.15;
-}
-.biz-role {
-  font-size: 7px; letter-spacing: 4px;
-  color: rgba(200,184,154,0.4); margin-top: 6px; font-weight: 200;
-}
-.biz-div { width: 16px; height: 0.5px; background: var(--gold); margin: 14px 0; opacity: 0.5; }
-.biz-info {
-  font-size: 8px; letter-spacing: 1.5px;
-  color: rgba(200,184,154,0.28); line-height: 2.4; font-weight: 200;
-}
-.biz-back {
-  width: 100%; max-width: 340px;
-  background: linear-gradient(140deg, #141414, #0d0d0d);
-  border: 0.5px solid rgba(200,184,154,0.05);
-  border-radius: 16px; aspect-ratio: 1.75;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 32px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-}
-.action-btn {
-  width: 100%; max-width: 340px; padding: 17px;
-  background: transparent;
-  border: 0.5px solid rgba(200,184,154,0.2);
-  border-radius: 10px;
-  font-family: 'Josefin Sans', sans-serif;
-  font-size: 9px; letter-spacing: 4px;
-  color: rgba(200,184,154,0.4);
-  cursor: pointer; transition: all 0.25s;
-  margin-bottom: 10px;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: clamp(28px, 7.5vw, 88px);
   font-weight: 300;
-}
-.action-btn svg { width: 13px; height: 13px; stroke-width: 1.5; }
-.action-btn:hover, .action-btn:active {
-  background: rgba(200,184,154,0.04);
-  color: var(--gold); border-color: rgba(200,184,154,0.35);
+  letter-spacing: clamp(2px, 0.8vw, 8px);
+  color: #f0e8dc;
+  line-height: 1.05;
 }
 
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 28px; left: 50%;
-  transform: translateX(-50%) translateY(60px);
-  background: rgba(200,184,154,0.08);
-  border: 0.5px solid rgba(200,184,154,0.2);
-  backdrop-filter: blur(16px);
-  border-radius: 24px; padding: 11px 26px;
-  font-size: 9px; letter-spacing: 2px;
-  color: var(--gold);
-  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  z-index: 9999; white-space: nowrap; font-weight: 300;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-.footer {
-  text-align: center; padding: 36px 28px;
-  font-size: 8px; letter-spacing: 3px;
-  color: rgba(200,184,154,0.1);
-  border-top: 0.5px solid var(--border);
+.biz-title {
+  font-size: clamp(7px, 1.1vw, 12px);
+  letter-spacing: clamp(3px, 1vw, 8px);
+  color: rgba(200,184,154,0.75);
   font-weight: 200;
+  margin-top: clamp(4px, 0.8vw, 10px);
+  text-transform: uppercase;
 }
+
+.biz-rule {
+  width: clamp(20px, 4vw, 48px);
+  height: 1px;
+  background: rgba(200,184,154,0.75);
+  margin: clamp(10px, 2.2vw, 26px) 0;
+}
+
+/* 하단: 연락처 */
+.biz-contacts {
+  display: flex; flex-direction: column;
+  gap: clamp(6px, 1.4vw, 16px);
+}
+
+.biz-row {
+  display: flex; align-items: center;
+  gap: clamp(8px, 1.6vw, 18px);
+  text-decoration: none; color: inherit;
+}
+
+.biz-icon {
+  width: clamp(16px, 2.6vw, 28px);
+  height: clamp(16px, 2.6vw, 28px);
+  color: rgba(200,184,154,0.75);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.biz-icon svg { width: 100%; height: 100%; stroke-width: 1.5; }
+
+.biz-val {
+  font-size: clamp(8px, 1.4vw, 15px);
+  letter-spacing: clamp(0.5px, 0.4vw, 2px);
+  color: rgba(240,232,220,0.88);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* 우측 하단 버튼 */
+.biz-actions {
+  position: absolute;
+  bottom: clamp(20px, 5vw, 56px);
+  right: clamp(20px, 5vw, 56px);
+  display: flex; gap: clamp(6px, 1.2vw, 12px);
+}
+.biz-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: clamp(4px, 0.8vw, 8px);
+  padding: clamp(5px, 1vw, 11px) clamp(10px, 2vw, 22px);
+  background: transparent;
+  border: 0.5px solid rgba(200,184,154,0.22);
+  border-radius: clamp(4px, 0.8vw, 8px);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: clamp(5px, 0.8vw, 9px);
+  letter-spacing: clamp(1px, 0.5vw, 3px);
+  color: rgba(200,184,154,0.42);
+  cursor: pointer; transition: all 0.2s; font-weight: 300; white-space: nowrap;
+}
+.biz-btn svg { width: clamp(8px, 1.2vw, 13px); height: clamp(8px, 1.2vw, 13px); stroke-width: 1.5; }
+.biz-btn:hover, .biz-btn:active { background: rgba(200,184,154,0.06); color: #c8b89a; border-color: rgba(200,184,154,0.38); }
+
+/* ════════════════════════════════
+   PROFILE PAGE
+════════════════════════════════ */
+#pg-profile {
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(16px, 4vw, 44px);
+}
+.profile-wrap {
+  width: 100%; max-width: min(96vw, calc((100dvh - 80px) * 1.78));
+  aspect-ratio: 1.78 / 1;
+  background: #000;
+  border: 0.5px solid rgba(255,255,255,0.06);
+  border-radius: clamp(6px, 1.2vw, 14px);
+  padding: clamp(20px, 5vw, 56px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 4vw, 48px);
+}
+.pl {
+  display: flex; flex-direction: column; justify-content: space-between;
+  border-right: 0.5px solid rgba(200,184,154,0.1);
+  padding-right: clamp(16px, 4vw, 48px);
+}
+.pl-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(22px, 5.5vw, 64px); font-weight: 300;
+  letter-spacing: clamp(2px, 0.8vw, 8px); color: #f0e8dc; line-height: 1.05;
+}
+.pl-title {
+  font-size: clamp(6px, 0.95vw, 11px); letter-spacing: clamp(2px, 0.8vw, 7px);
+  color: rgba(200,184,154,0.5); font-weight: 200; margin-top: clamp(4px, 0.8vw, 10px);
+  text-transform: uppercase;
+}
+.pl-rule { width: clamp(14px, 3vw, 36px); height: 1px; background: rgba(200,184,154,0.45); margin: clamp(8px, 1.8vw, 20px) 0; }
+.pl-about {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(11px, 1.8vw, 18px); font-weight: 300; font-style: italic;
+  line-height: 1.9; color: rgba(240,232,220,0.42); letter-spacing: 0.3px;
+}
+.pr { display: flex; flex-direction: column; justify-content: space-between; }
+.pr-label { font-size: clamp(6px, 0.75vw, 8px); letter-spacing: clamp(3px, 0.8vw, 6px); color: rgba(200,184,154,0.22); font-weight: 200; margin-bottom: clamp(8px, 1.5vw, 18px); }
+.pr-contacts { display: flex; flex-direction: column; gap: clamp(8px, 1.8vw, 20px); }
+.pr-row {
+  display: flex; align-items: center; gap: clamp(8px, 1.5vw, 16px);
+  padding-bottom: clamp(8px, 1.5vw, 18px);
+  border-bottom: 0.5px solid rgba(200,184,154,0.08);
+  text-decoration: none; color: inherit; cursor: pointer; transition: opacity 0.2s;
+}
+.pr-row:last-child { border-bottom: none; padding-bottom: 0; }
+.pr-row:hover { opacity: 0.7; }
+.pr-icon { width: clamp(24px, 3.5vw, 36px); height: clamp(24px, 3.5vw, 36px); border: 0.5px solid rgba(200,184,154,0.14); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: rgba(200,184,154,0.38); }
+.pr-icon svg { width: clamp(10px, 1.4vw, 14px); height: clamp(10px, 1.4vw, 14px); stroke-width: 1.5; }
+.pr-clabel { font-size: clamp(5px, 0.7vw, 8px); letter-spacing: 2px; color: rgba(200,184,154,0.22); font-weight: 200; margin-bottom: 3px; }
+.pr-cval { font-size: clamp(9px, 1.3vw, 13px); letter-spacing: clamp(0.5px, 0.3vw, 1.5px); color: rgba(200,184,154,0.62); font-weight: 300; }
+.pr-btns { display: flex; flex-direction: column; gap: clamp(6px, 1.2vw, 10px); }
+.pr-btn {
+  display: flex; align-items: center; justify-content: center; gap: clamp(6px, 1vw, 10px);
+  padding: clamp(7px, 1.4vw, 13px);
+  background: transparent; border: 0.5px solid rgba(200,184,154,0.18); border-radius: clamp(5px, 1vw, 10px);
+  font-family: 'Josefin Sans', sans-serif; font-size: clamp(6px, 0.85vw, 9px); letter-spacing: clamp(1.5px, 0.5vw, 4px);
+  color: rgba(200,184,154,0.38); cursor: pointer; transition: all 0.22s; font-weight: 300;
+}
+.pr-btn svg { width: clamp(10px, 1.4vw, 13px); height: clamp(10px, 1.4vw, 13px); stroke-width: 1.5; }
+.pr-btn:hover { background: rgba(200,184,154,0.04); color: #c8b89a; border-color: rgba(200,184,154,0.32); }
+
+/* ════════════════════════════════
+   MUSIC PAGE
+════════════════════════════════ */
+#pg-music {
+  display: flex; flex-direction: column;
+  padding: clamp(12px, 2.5vw, 28px);
+  gap: clamp(10px, 2vw, 18px);
+  align-items: stretch; justify-content: flex-start;
+}
+.music-top { display: flex; gap: clamp(12px, 2.5vw, 24px); flex: 1; min-height: 0; }
+.viz-wrap { flex: 1; border-radius: clamp(8px, 1.5vw, 14px); background: #0a0a0a; border: 0.5px solid rgba(200,184,154,0.1); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; min-height: 0; }
+.viz-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.viz-lbl { position: absolute; bottom: clamp(8px,1.5vw,14px); left: clamp(10px,2vw,18px); font-size: clamp(6px,0.9vw,8px); letter-spacing: clamp(2px,0.6vw,4px); color: rgba(200,184,154,0.25); pointer-events: none; font-weight: 200; }
+.viz-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: clamp(8px,1.2vw,11px); letter-spacing: 3px; color: rgba(200,184,154,0.2); pointer-events: none; transition: opacity 0.3s; }
+.pl-wrap { width: clamp(110px,26vw,200px); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+.pl-wrap::-webkit-scrollbar { display: none; }
+.pl-hdr { font-size: clamp(6px,0.8vw,8px); letter-spacing: clamp(2px,0.6vw,5px); color: rgba(200,184,154,0.22); font-weight: 200; margin-bottom: clamp(6px,1.2vw,10px); flex-shrink: 0; }
+.pli { display: flex; align-items: center; gap: clamp(6px,1.2vw,12px); padding: clamp(8px,1.5vw,13px) clamp(6px,1.2vw,10px); border-radius: clamp(6px,1vw,10px); cursor: pointer; transition: background 0.18s; flex-shrink: 0; }
+.pli:hover { background: rgba(255,255,255,0.025); }
+.pli.on { background: rgba(200,184,154,0.06); }
+.pli-icon { width: clamp(26px,3.8vw,36px); height: clamp(26px,3.8vw,36px); background: #111; border-radius: clamp(4px,0.7vw,6px); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: rgba(200,184,154,0.16); }
+.pli-icon svg { width: clamp(10px,1.4vw,13px); height: clamp(10px,1.4vw,13px); stroke-width: 1.2; }
+.pli-info { flex: 1; min-width: 0; }
+.pli-title { font-size: clamp(8px,1.1vw,11px); letter-spacing: clamp(0.5px,0.3vw,1.5px); color: rgba(240,232,220,0.7); font-weight: 300; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pli-dur { font-size: clamp(6px,0.8vw,8px); letter-spacing: 1px; color: rgba(200,184,154,0.22); margin-top: 3px; font-weight: 200; }
+.pli-act { color: rgba(200,184,154,0.2); flex-shrink: 0; }
+.pli-act svg { width: clamp(9px,1.3vw,13px); height: clamp(9px,1.3vw,13px); stroke-width: 1.5; }
+.pli.on .pli-act { color: #c8b89a; }
+.music-ctrl { flex-shrink: 0; background: #0a0a0a; border: 0.5px solid rgba(200,184,154,0.1); border-radius: clamp(8px,1.5vw,14px); padding: clamp(10px,2vw,18px) clamp(12px,2.5vw,24px); display: flex; flex-direction: column; gap: clamp(7px,1.4vw,13px); }
+.ctrl-tname { font-family: 'Cormorant Garamond', serif; font-size: clamp(14px,2.5vw,22px); font-weight: 400; color: #f0e8dc; letter-spacing: 0.5px; }
+.ctrl-tartist { font-size: clamp(6px,0.9vw,9px); letter-spacing: clamp(1px,0.4vw,3px); color: rgba(200,184,154,0.25); font-weight: 200; }
+.prog { width: 100%; height: 1.5px; background: rgba(255,255,255,0.07); border-radius: 1px; cursor: pointer; position: relative; }
+.pfill { height: 100%; background: #c8b89a; border-radius: 1px; position: relative; transition: width 0.08s linear; }
+.pdot { width: clamp(7px,1.2vw,10px); height: clamp(7px,1.2vw,10px); background: #c8b89a; border-radius: 50%; position: absolute; right: calc(clamp(7px,1.2vw,10px) / -2); top: 50%; transform: translateY(-50%); }
+.time-row { display: flex; justify-content: space-between; font-size: clamp(6px,0.85vw,8px); letter-spacing: 1px; color: rgba(200,184,154,0.2); }
+.ctrl-btns { display: flex; align-items: center; justify-content: center; gap: clamp(12px,3vw,28px); }
+.cb { background: none; border: none; cursor: pointer; color: rgba(200,184,154,0.28); transition: color 0.2s; display: flex; align-items: center; justify-content: center; padding: 4px; }
+.cb svg { width: clamp(14px,2.2vw,20px); height: clamp(14px,2.2vw,20px); stroke-width: 1.5; }
+.cb:hover { color: #c8b89a; }
+.pb { width: clamp(36px,5.5vw,52px); height: clamp(36px,5.5vw,52px); border: 1px solid rgba(200,184,154,0.38); border-radius: 50%; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #c8b89a; transition: all 0.22s; }
+.pb svg { width: clamp(13px,2vw,18px); height: clamp(13px,2vw,18px); stroke-width: 1.5; }
+.pb:hover { background: rgba(200,184,154,0.07); }
+.vol-row { display: flex; align-items: center; gap: clamp(8px,1.5vw,14px); }
+.vol-icn { color: rgba(200,184,154,0.22); display: flex; }
+.vol-icn svg { width: clamp(10px,1.5vw,14px); height: clamp(10px,1.5vw,14px); stroke-width: 1.5; }
+input[type=range].vol { -webkit-appearance: none; flex: 1; height: 1.5px; background: rgba(255,255,255,0.07); border-radius: 1px; outline: none; border: none; padding: 0; cursor: pointer; }
+input[type=range].vol::-webkit-slider-thumb { -webkit-appearance: none; width: clamp(9px,1.4vw,12px); height: clamp(9px,1.4vw,12px); border-radius: 50%; background: #c8b89a; cursor: pointer; }
+
+/* TOAST */
+.toast { position: fixed; bottom: clamp(16px,3vw,28px); left: 50%; transform: translateX(-50%) translateY(60px); background: rgba(200,184,154,0.08); border: 0.5px solid rgba(200,184,154,0.2); backdrop-filter: blur(16px); border-radius: 24px; padding: 10px 24px; font-size: 9px; letter-spacing: 2px; color: #c8b89a; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); z-index: 9999; white-space: nowrap; font-weight: 300; }
+.toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
+<div class="app">
 
-<!-- NAV -->
-<div class="nav">
-  <div class="nlogo">SCH</div>
-  <div class="ntabs">
-    <button class="ntab on" onclick="pg('p')">PROFILE</button>
-    <button class="ntab" onclick="pg('m')">MUSIC</button>
-    <button class="ntab" onclick="pg('c')">CARD</button>
+  <div class="nav">
+    <div class="nlogo">SCH</div>
+    <div class="ntabs">
+      <button class="ntab on" onclick="pg('card')">CARD</button>
+      <button class="ntab" onclick="pg('profile')">PROFILE</button>
+      <button class="ntab" onclick="pg('music')">MUSIC</button>
+    </div>
+  </div>
+
+  <div class="pages">
+
+    <!-- ═══ CARD ═══ -->
+    <div class="page on" id="pg-card">
+      <div class="card-outer">
+        <div class="biz">
+
+          <div class="biz-top">
+            <div class="biz-name">Soon chunhyang</div>
+            <div class="biz-title">SOONCHUNHYANG MELAB</div>
+            <div class="biz-rule"></div>
+          </div>
+
+          <div class="biz-contacts">
+            <a class="biz-row" href="tel:+821012345678">
+              <div class="biz-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 012 2.18 2 2 0 014 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+              </div>
+              <div class="biz-val">+82 1234 5678</div>
+            </a>
+            <a class="biz-row" href="mailto:Wipung_Cheonhyang@naver.com">
+              <div class="biz-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div class="biz-val">Wipung_Cheonhyang@naver.com</div>
+            </a>
+            <div class="biz-row">
+              <div class="biz-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div class="biz-val">22, Soonchunhyang-ro, Sinchang-myeon,<br>Asan-si, Chungcheongnam-do, Republic of Korea</div>
+            </div>
+          </div>
+
+          <div class="biz-actions">
+            <button class="biz-btn" onclick="saveVCard()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              SAVE
+            </button>
+            <button class="biz-btn" onclick="shareCard()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              SHARE
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PROFILE ═══ -->
+    <div class="page" id="pg-profile">
+      <div class="profile-wrap">
+        <div class="pl">
+          <div>
+            <div class="pl-name">Soon<br>chunhyang</div>
+            <div class="pl-title">SOONCHUNHYANG MELAB</div>
+          </div>
+          <div>
+            <div class="pl-rule"></div>
+            <div class="pl-about">경험을 통해 가치를 만들고,<br>사람들의 일상에 영감을 더합니다.</div>
+          </div>
+        </div>
+        <div class="pr">
+          <div>
+            <div class="pr-label">CONTACT</div>
+            <div class="pr-contacts">
+              <a class="pr-row" href="tel:+821012345678">
+                <div class="pr-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 012 2.18 2 2 0 014 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg></div>
+                <div><div class="pr-clabel">PHONE</div><div class="pr-cval">+82 1234 5678</div></div>
+              </a>
+              <a class="pr-row" href="mailto:Wipung_Cheonhyang@naver.com">
+                <div class="pr-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+                <div><div class="pr-clabel">EMAIL</div><div class="pr-cval">Wipung_Cheonhyang@naver.com</div></div>
+              </a>
+              <div class="pr-row">
+                <div class="pr-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                <div><div class="pr-clabel">ADDRESS</div><div class="pr-cval">Asan-si, Chungcheongnam-do</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="pr-btns">
+            <button class="pr-btn" onclick="saveVCard()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CONTACT SAVE
+            </button>
+            <button class="pr-btn" onclick="shareCard()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              SHARE
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MUSIC ═══ -->
+    <div class="page" id="pg-music">
+      <div class="music-top">
+        <div class="viz-wrap" onclick="togglePlay()">
+          <canvas class="viz-canvas" id="viz"></canvas>
+          <div class="viz-lbl" id="albl">QUIET HOURS</div>
+          <div class="viz-hint" id="ahint">탭하여 재생</div>
+        </div>
+        <div class="pl-wrap">
+          <div class="pl-hdr">PLAYLIST</div>
+          <div id="plist"></div>
+        </div>
+      </div>
+      <div class="music-ctrl">
+        <div>
+          <div class="ctrl-tname" id="tname">Quiet Hours</div>
+          <div class="ctrl-tartist">Soon chunhyang</div>
+        </div>
+        <div>
+          <div class="prog" onclick="seek(event,this)">
+            <div class="pfill" id="pf" style="width:0%"><div class="pdot"></div></div>
+          </div>
+          <div class="time-row"><span id="ct">0:00</span><span id="tt">3:00</span></div>
+        </div>
+        <div class="ctrl-btns">
+          <button class="cb" onclick="prevT()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg></button>
+          <button class="pb" id="playbtn" onclick="togglePlay()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+          <button class="cb" onclick="nextT()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg></button>
+        </div>
+        <div class="vol-row">
+          <div class="vol-icn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg></div>
+          <input type="range" class="vol" min="0" max="1" step="0.01" value="0.6" oninput="setVol(this.value)">
+          <div class="vol-icn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
-
-<!-- ── PROFILE ── -->
-<div class="page on" id="pg-p">
-  <div class="hero">
-    <div class="hbg"></div>
-    <div class="hlv"></div>
-    <div class="hc">
-      <div class="hey">DIGITAL PROFILE · 2025</div>
-      <div class="hname">순천향<br>미랩</div>
-      <div class="hrole">SOONCHUNHYANG MELAB</div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-label">ABOUT</div>
-    <div class="sec-line"></div>
-    <div class="about-text">
-      경험을 통해 가치를 만들고,<br>
-      사람들의 일상에 영감을 더합니다.
-    </div>
-  </div>
-
-  <div class="sec">
-    <div class="sec-label">CONTACT</div>
-    <div class="sec-line"></div>
-    <div class="clist">
-      <a class="crow" href="tel:01012345678">
-        <div class="cicn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
-        </div>
-        <div class="cinfo">
-          <div class="clabel">PHONE</div>
-          <div class="cval">010-1234-5678</div>
-        </div>
-      </a>
-      <div class="crow">
-        <div class="cicn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <div class="cinfo">
-          <div class="clabel">LOCATION</div>
-          <div class="cval">순천향 미랩</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <button class="savebtn" onclick="saveVCard()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      CONTACT SAVE
-    </button>
-  </div>
-
-  <div class="footer">© 2025 SOONCHUNHYANG MELAB · ALL RIGHTS RESERVED</div>
-</div>
-
-<!-- ── MUSIC ── -->
-<div class="page" id="pg-m">
-  <div class="sec">
-    <div class="sec-label">CURATED MUSIC</div>
-    <div class="sec-line"></div>
-    <div class="mood-badge">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      집중 &amp; 힐링
-    </div>
-
-    <div class="pcard">
-      <div class="art" onclick="togglePlay()">
-        <canvas class="art-canvas" id="viz"></canvas>
-        <div class="art-lbl" id="albl">QUIET HOURS</div>
-        <div class="art-hint" id="ahint">탭하여 재생</div>
-      </div>
-      <div class="tname" id="tname">Quiet Hours</div>
-      <div class="tartist">순천향 미랩</div>
-      <div class="prog" onclick="seek(event,this)">
-        <div class="pfill" id="pf" style="width:0%"><div class="pdot"></div></div>
-      </div>
-      <div class="trow"><span id="ct">0:00</span><span id="tt">3:00</span></div>
-      <div class="ctrls">
-        <button class="cb" onclick="prevT()" title="이전">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
-        </button>
-        <button class="pb" id="playbtn" onclick="togglePlay()">
-          <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </button>
-        <button class="cb" onclick="nextT()" title="다음">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
-        </button>
-      </div>
-      <div class="vol-row">
-        <div class="vol-icn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
-        </div>
-        <input type="range" class="vol" min="0" max="1" step="0.01" value="0.6" oninput="setVol(this.value)">
-        <div class="vol-icn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="sec-label" style="margin-bottom:12px">PLAYLIST</div>
-    <div class="plist" id="plist"></div>
-  </div>
-</div>
-
-<!-- ── CARD ── -->
-<div class="page" id="pg-c">
-  <div class="cardsec">
-    <div class="biz-front">
-      <div>
-        <div class="biz-name">순천향<br>미랩</div>
-        <div class="biz-role">SOONCHUNHYANG MELAB</div>
-        <div class="biz-div"></div>
-        <div class="biz-info">010-1234-5678<br>순천향 미랩</div>
-      </div>
-    </div>
-    <div class="biz-back">
-      <div style="text-align:center;font-size:7px;letter-spacing:4px;color:rgba(200,184,154,0.12);font-weight:200;line-height:2">DIGITAL CARD<br>순천향 미랩</div>
-    </div>
-    <button class="action-btn" onclick="saveVCard()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      CONTACT SAVE
-    </button>
-    <button class="action-btn" onclick="shareCard()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      SHARE
-    </button>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ── 네비 ─────────────────────────────────────────────────────
-function pg(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('on'));
-  document.getElementById('pg-' + id).classList.add('on');
-  document.querySelectorAll('.ntab')[{p:0,m:1,c:2}[id]].classList.add('on');
-}
-
-// ── Web Audio ─────────────────────────────────────────────────
-let AC=null, masterGain=null, analyser=null;
-let currentNodes=[], playing=false, progSec=0, progTimer=null, ci=0;
-const trackDur = 180;
-
-const TRACKS = [
-  { t:'Quiet Hours',  chord:[261.63,329.63,392.00], scale:[261.63,293.66,329.63,349.23,392.00,440.00], pad:true,  bass:true,  arp:false },
-  { t:'Still Waters', chord:[220.00,277.18,329.63], scale:[220.00,246.94,277.18,293.66,329.63,369.99], pad:true,  bass:true,  arp:true  },
-  { t:'Morning Mist', chord:[174.61,220.00,261.63], scale:[174.61,195.99,220.00,246.94,261.63,293.66], pad:true,  bass:false, arp:true  },
+function pg(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));document.getElementById('pg-'+id).classList.add('on');document.querySelectorAll('.ntab')[{card:0,profile:1,music:2}[id]].classList.add('on');}
+let AC=null,mg=null,an=null,nodes=[],playing=false,ps=0,tmr=null,ci=0;
+const DUR=180;
+const TRK=[
+  {t:'Quiet Hours', chord:[261.63,329.63,392.00],scale:[261.63,293.66,329.63,349.23,392.00,440.00],pad:true,bass:true,arp:false},
+  {t:'Still Waters',chord:[220.00,277.18,329.63],scale:[220.00,246.94,277.18,293.66,329.63,369.99],pad:true,bass:true,arp:true},
+  {t:'Morning Mist',chord:[174.61,220.00,261.63],scale:[174.61,195.99,220.00,246.94,261.63,293.66],pad:true,bass:false,arp:true},
 ];
-
-function initAudio() {
-  if (AC) return;
-  AC = new (window.AudioContext || window.webkitAudioContext)();
-  masterGain = AC.createGain(); masterGain.gain.value = 0.6;
-  analyser = AC.createAnalyser(); analyser.fftSize = 256;
-  masterGain.connect(analyser); analyser.connect(AC.destination);
-}
-
-function stopAll() { currentNodes.forEach(n => { try { n.stop(); } catch(e){} }); currentNodes = []; }
-
-function playAudio(td) {
-  if (!AC) return; stopAll();
-  const now = AC.currentTime, beatSec = 1.0;
-  const totalBars = Math.ceil(trackDur / (beatSec * 4));
-  function osc(f, type, st, dur, vol, det=0) {
-    const o = AC.createOscillator(), g = AC.createGain();
-    o.type = type; o.frequency.value = f; if (det) o.detune.value = det;
-    o.connect(g); g.connect(masterGain);
-    g.gain.setValueAtTime(0, st);
-    g.gain.linearRampToValueAtTime(vol, st+0.08);
-    g.gain.linearRampToValueAtTime(vol*0.7, st+dur*0.5);
-    g.gain.linearRampToValueAtTime(0, st+dur);
-    o.start(st); o.stop(st+dur+0.1); currentNodes.push(o);
-  }
-  function noise(st, dur, vol) {
-    const buf = AC.createBuffer(1, AC.sampleRate*dur, AC.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i=0; i<d.length; i++) d[i] = (Math.random()*2-1)*0.15;
-    const src = AC.createBufferSource(), g = AC.createGain(), filt = AC.createBiquadFilter();
-    filt.type='bandpass'; filt.frequency.value=200;
-    src.buffer=buf; src.connect(filt); filt.connect(g); g.connect(masterGain);
-    g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(vol,st+0.02); g.gain.linearRampToValueAtTime(0,st+dur);
-    src.start(st); src.stop(st+dur+0.05); currentNodes.push(src);
-  }
-  for (let b=0; b<totalBars; b++) {
-    const bt = now + b*beatSec*4;
-    if (td.pad) td.chord.forEach((f,i) => { osc(f/2,'sine',bt,beatSec*4-.1,0.18-i*0.04); osc(f,'sine',bt,beatSec*4-.1,0.09-i*0.03,4); });
-    if (td.bass) { osc(td.chord[0]/2,'triangle',bt,beatSec*.9,0.22); osc(td.chord[0]/2,'triangle',bt+beatSec*2,beatSec*.9,0.22); }
-    if (td.arp) { const an=[...td.scale,td.scale[td.scale.length-1]*1.5]; [0,2,4,3,5,4,2,1].forEach((ni,si)=>{ osc(an[ni%an.length],'triangle',bt+si*beatSec*0.5,beatSec*0.35,0.11); }); }
-    if (b%2===0) { noise(bt,0.08,0.28); noise(bt+beatSec*2,0.06,0.18); }
-  }
-}
-
-function fmt(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
-
-function startTimer() {
-  clearInterval(progTimer);
-  progTimer = setInterval(() => {
-    if (!playing) return;
-    progSec++;
-    if (progSec >= trackDur) { nextT(); return; }
-    document.getElementById('pf').style.width = (progSec/trackDur*100) + '%';
-    document.getElementById('ct').textContent = fmt(progSec);
-  }, 1000);
-}
-
-const playIconSVG  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
-const pauseIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
-
-function togglePlay() {
-  initAudio();
-  if (AC.state === 'suspended') AC.resume();
-  playing = !playing;
-  document.getElementById('playbtn').innerHTML = playing ? pauseIconSVG : playIconSVG;
-  document.getElementById('ahint').style.opacity = playing ? '0' : '0.7';
-  if (playing) { playAudio(TRACKS[ci]); startTimer(); }
-  else { stopAll(); clearInterval(progTimer); }
-}
-
-function loadTrack(i, auto) {
-  if (playing) { stopAll(); clearInterval(progTimer); playing = false; }
-  ci = i; progSec = 0;
-  document.getElementById('pf').style.width = '0%';
-  document.getElementById('ct').textContent = '0:00';
-  document.getElementById('tname').textContent = TRACKS[i].t;
-  document.getElementById('albl').textContent = TRACKS[i].t.toUpperCase();
-  document.getElementById('playbtn').innerHTML = playIconSVG;
-  document.getElementById('ahint').style.opacity = '0.7';
-  buildPlist();
-  if (auto) { playing = false; togglePlay(); }
-}
-
-function nextT() { loadTrack((ci+1) % TRACKS.length, true); }
-function prevT() { loadTrack((ci-1+TRACKS.length) % TRACKS.length, playing); }
-function seek(e, el) {
-  const r = el.getBoundingClientRect();
-  progSec = Math.floor(((e.clientX - r.left) / r.width) * trackDur);
-  document.getElementById('pf').style.width = (progSec/trackDur*100) + '%';
-  if (playing) { stopAll(); playAudio(TRACKS[ci]); }
-}
-function setVol(v) { if (masterGain) masterGain.gain.value = parseFloat(v); }
-
-function buildPlist() {
-  const pl = document.getElementById('plist'); pl.innerHTML = '';
-  TRACKS.forEach((t, i) => {
-    const d = document.createElement('div');
-    d.className = 'pli' + (i===ci ? ' on' : '');
-    d.onclick = () => loadTrack(i, true);
-    const icon = i === ci
-      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
-    d.innerHTML = `
-      <div class="pthumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
-      <div class="pinfo"><div class="ptitle">${t.t.toUpperCase()}</div><div class="psub">3:00</div></div>
-      <div class="pact">${icon}</div>`;
-    pl.appendChild(d);
-  });
-}
-
-// ── 비주얼라이저 ─────────────────────────────────────────────
-function drawViz() {
-  requestAnimationFrame(drawViz);
-  if (!analyser) return;
-  const canvas = document.getElementById('viz');
-  if (!canvas || !canvas.offsetWidth) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width = canvas.offsetWidth;
-  const H = canvas.height = canvas.offsetHeight;
-  const data = new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteFrequencyData(data);
-  ctx.clearRect(0, 0, W, H);
-  if (playing) {
-    const avg = data.reduce((a,b)=>a+b,0)/data.length;
-    ctx.fillStyle = `rgba(200,184,154,${(avg/255)*0.06})`;
-    ctx.fillRect(0,0,W,H);
-  }
-  const n = 48, bw = W/n - 1.5;
-  for (let i=0; i<n; i++) {
-    const v = playing ? (data[Math.floor(i*data.length/n)]/255) : (0.03 + Math.sin(Date.now()/2400+i*0.3)*0.03);
-    const h = Math.max(2, v*H*0.72);
-    const x = i * (bw + 1.5);
-    const a = playing ? (0.15 + v*0.5) : 0.06;
-    ctx.fillStyle = `rgba(200,184,154,${a})`;
-    ctx.beginPath();
-    ctx.roundRect(x, H-h, bw, h, 1.5);
-    ctx.fill();
-  }
-}
-
-// ── 유틸 ─────────────────────────────────────────────────────
-function saveVCard() {
-  const vc = ['BEGIN:VCARD','VERSION:3.0','FN:순천향 미랩','ORG:순천향 미랩','TEL:01012345678','ADR:;;순천향 미랩;;;;Korea','END:VCARD'].join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([vc],{type:'text/vcard'}));
-  a.download = '순천향_미랩.vcf'; a.click();
-  showToast('연락처가 저장되었습니다');
-}
-function shareCard() {
-  if (navigator.share) { navigator.share({title:'순천향 미랩 디지털 명함', url: location.href}); }
-  else { navigator.clipboard.writeText(location.href).then(()=>showToast('링크가 복사되었습니다')); }
-}
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2800);
-}
-
-buildPlist();
-drawViz();
+function initAC(){if(AC)return;AC=new(window.AudioContext||window.webkitAudioContext)();mg=AC.createGain();mg.gain.value=0.6;an=AC.createAnalyser();an.fftSize=256;mg.connect(an);an.connect(AC.destination);}
+function stopAll(){nodes.forEach(n=>{try{n.stop()}catch(e){}});nodes=[];}
+function playAudio(td){if(!AC)return;stopAll();const now=AC.currentTime,bs=1.0,bars=Math.ceil(DUR/(bs*4));function osc(f,type,st,dur,vol,det=0){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;if(det)o.detune.value=det;o.connect(g);g.connect(mg);g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(vol,st+0.08);g.gain.linearRampToValueAtTime(vol*0.7,st+dur*0.5);g.gain.linearRampToValueAtTime(0,st+dur);o.start(st);o.stop(st+dur+0.1);nodes.push(o);}function noise(st,dur,vol){const buf=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.15;const src=AC.createBufferSource(),g=AC.createGain(),filt=AC.createBiquadFilter();filt.type='bandpass';filt.frequency.value=200;src.buffer=buf;src.connect(filt);filt.connect(g);g.connect(mg);g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(vol,st+0.02);g.gain.linearRampToValueAtTime(0,st+dur);src.start(st);src.stop(st+dur+0.05);nodes.push(src);}for(let b=0;b<bars;b++){const bt=now+b*bs*4;if(td.pad)td.chord.forEach((f,i)=>{osc(f/2,'sine',bt,bs*4-.1,0.18-i*0.04);osc(f,'sine',bt,bs*4-.1,0.09-i*0.03,4);});if(td.bass){osc(td.chord[0]/2,'triangle',bt,bs*.9,0.22);osc(td.chord[0]/2,'triangle',bt+bs*2,bs*.9,0.22);}if(td.arp){const ar=[...td.scale,td.scale[td.scale.length-1]*1.5];[0,2,4,3,5,4,2,1].forEach((ni,si)=>{osc(ar[ni%ar.length],'triangle',bt+si*bs*0.5,bs*0.35,0.11);});}if(b%2===0){noise(bt,0.08,0.28);noise(bt+bs*2,0.06,0.18);}}}
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function startTmr(){clearInterval(tmr);tmr=setInterval(()=>{if(!playing)return;ps++;if(ps>=DUR){nextT();return;}document.getElementById('pf').style.width=(ps/DUR*100)+'%';document.getElementById('ct').textContent=fmt(ps);},1000);}
+const PS='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+const PA='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+function togglePlay(){initAC();if(AC.state==='suspended')AC.resume();playing=!playing;document.getElementById('playbtn').innerHTML=playing?PA:PS;document.getElementById('ahint').style.opacity=playing?'0':'0.7';if(playing){playAudio(TRK[ci]);startTmr();}else{stopAll();clearInterval(tmr);}}
+function loadTrack(i,auto){if(playing){stopAll();clearInterval(tmr);playing=false;}ci=i;ps=0;document.getElementById('pf').style.width='0%';document.getElementById('ct').textContent='0:00';document.getElementById('tname').textContent=TRK[i].t;document.getElementById('albl').textContent=TRK[i].t.toUpperCase();document.getElementById('playbtn').innerHTML=PS;document.getElementById('ahint').style.opacity='0.7';buildPlist();if(auto){playing=false;togglePlay();}}
+function nextT(){loadTrack((ci+1)%TRK.length,true);}
+function prevT(){loadTrack((ci-1+TRK.length)%TRK.length,playing);}
+function seek(e,el){const r=el.getBoundingClientRect();ps=Math.floor(((e.clientX-r.left)/r.width)*DUR);document.getElementById('pf').style.width=(ps/DUR*100)+'%';if(playing){stopAll();playAudio(TRK[ci]);}}
+function setVol(v){if(mg)mg.gain.value=parseFloat(v);}
+function buildPlist(){const pl=document.getElementById('plist');pl.innerHTML='';TRK.forEach((t,i)=>{const d=document.createElement('div');d.className='pli'+(i===ci?' on':'');d.onclick=()=>loadTrack(i,true);const icon=i===ci?PA:PS;d.innerHTML=`<div class="pli-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><div class="pli-info"><div class="pli-title">${t.t.toUpperCase()}</div><div class="pli-dur">3:00</div></div><div class="pli-act">${icon}</div>`;pl.appendChild(d);});}
+function drawViz(){requestAnimationFrame(drawViz);if(!an)return;const c=document.getElementById('viz');if(!c||!c.offsetWidth)return;const ctx=c.getContext('2d');const W=c.width=c.offsetWidth,H=c.height=c.offsetHeight;const data=new Uint8Array(an.frequencyBinCount);an.getByteFrequencyData(data);ctx.clearRect(0,0,W,H);if(playing){const avg=data.reduce((a,b)=>a+b,0)/data.length;ctx.fillStyle=`rgba(200,184,154,${(avg/255)*0.05})`;ctx.fillRect(0,0,W,H);}const n=52,bw=W/n-1.2;for(let i=0;i<n;i++){const v=playing?(data[Math.floor(i*data.length/n)]/255):(0.03+Math.sin(Date.now()/2400+i*0.3)*0.025);const h=Math.max(2,v*H*0.72),x=i*(bw+1.2),a=playing?(0.13+v*0.5):0.05;ctx.fillStyle=`rgba(200,184,154,${a})`;ctx.beginPath();ctx.roundRect(x,H-h,bw,h,1.5);ctx.fill();}}
+function saveVCard(){const vc=['BEGIN:VCARD','VERSION:3.0','FN:Soon chunhyang','ORG:Soonchunhyang Melab','TEL:+821012345678','EMAIL:Wipung_Cheonhyang@naver.com','ADR:;;22 Soonchunhyang-ro Sinchang-myeon Asan-si Chungcheongnam-do;;;;Republic of Korea','END:VCARD'].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([vc],{type:'text/vcard'}));a.download='Soonchunhyang_Melab.vcf';a.click();showToast('연락처가 저장되었습니다');}
+function shareCard(){if(navigator.share){navigator.share({title:'Soon chunhyang · Digital Card',url:location.href});}else{navigator.clipboard.writeText(location.href).then(()=>showToast('링크가 복사되었습니다'));}}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
+buildPlist();drawViz();
 </script>
 </body>
 </html>
