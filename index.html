@@ -3,676 +3,752 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Digital Card</title>
+<title>순천향 미랩 · Digital Card</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<!-- Lucide icons via CDN -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--gold:#c8b89a;--gd:rgba(200,184,154,0.45);--bg:#070707;--border:rgba(200,184,154,0.1);--text:#f0e8dc}
-html,body{min-height:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:'Josefin Sans',sans-serif}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* ── SETUP SCREEN ── */
-#setup-screen{position:fixed;inset:0;background:var(--bg);z-index:9000;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:60px 24px 80px}
-#setup-screen.hide{display:none}
-.su-hdr{text-align:center;margin-bottom:44px;animation:rise .7s ease both}
-.su-sub{font-size:9px;letter-spacing:6px;color:var(--gd);margin-bottom:14px}
-.su-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:2px;line-height:1.2}
-.su-line{width:32px;height:1px;background:var(--gold);margin:16px auto 0;opacity:.6}
-.steps{display:flex;align-items:center;justify-content:center;margin-bottom:40px}
-.sdot{width:28px;height:28px;border-radius:50%;border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:1px;color:rgba(200,184,154,.35);transition:all .35s}
-.sdot.active{border-color:var(--gold);color:var(--gold);background:rgba(200,184,154,.07)}
-.sdot.done{border-color:var(--gold);color:var(--gold);background:rgba(200,184,154,.06)}
-.sline{width:36px;height:.5px;background:var(--border);transition:background .35s}
-.sline.done{background:var(--gd)}
-.su-card{width:100%;max-width:580px;background:rgba(255,255,255,.024);border:.5px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px;display:none;animation:rise .5s ease both}
-.su-card.on{display:block}
-.ctitle{font-size:9px;letter-spacing:5px;color:var(--gd);margin-bottom:5px}
-.chead{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;margin-bottom:24px}
-.row{margin-bottom:20px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-label{display:block;font-size:9px;letter-spacing:3px;color:var(--gd);margin-bottom:8px}
-input[type=text],input[type=number],input[type=email],input[type=tel],textarea{width:100%;background:rgba(255,255,255,.025);border:.5px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Josefin Sans',sans-serif;font-size:12px;letter-spacing:1.5px;color:var(--text);outline:none;transition:border-color .22s;-webkit-appearance:none}
-input:focus,textarea:focus{border-color:var(--gd);background:rgba(200,184,154,.03)}
-input::placeholder,textarea::placeholder{color:rgba(200,184,154,.18)}
-textarea{resize:vertical;min-height:80px;line-height:1.8}
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{background:rgba(255,255,255,.02);border:.5px solid var(--border);border-radius:20px;padding:7px 14px;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(200,184,154,.35);cursor:pointer;transition:all .18s;user-select:none}
-.chip.on{background:rgba(200,184,154,.1);border-color:var(--gold);color:var(--gold)}
-.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mbtn{background:rgba(255,255,255,.02);border:.5px solid var(--border);border-radius:10px;padding:12px 6px;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(200,184,154,.35);cursor:pointer;transition:all .18s;text-align:center}
-.mbtn:hover,.mbtn.on{background:rgba(200,184,154,.08);border-color:var(--gd);color:var(--gold)}
-.mbtn .mi{font-size:16px;display:block;margin-bottom:6px}
-input[type=range]{-webkit-appearance:none;width:100%;height:2px;background:rgba(255,255,255,.07);border-radius:1px;outline:none;border:none;padding:0;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 0 0 4px rgba(200,184,154,.1)}
-.slabs{display:flex;justify-content:space-between;font-size:9px;letter-spacing:2px;color:rgba(200,184,154,.22);margin-top:8px}
-.sval{text-align:center;font-size:24px;font-family:'Cormorant Garamond',serif;font-weight:300;color:var(--gold);margin:8px 0 4px}
-.brow{display:flex;gap:10px;margin-top:24px}
-.btn{flex:1;padding:14px;border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:3px;cursor:pointer;transition:all .25s}
-.btn-s{background:transparent;border:.5px solid var(--border);color:rgba(200,184,154,.35)}
-.btn-s:hover{border-color:var(--gd);color:var(--gold)}
-.btn-p{background:rgba(200,184,154,.07);border:1px solid var(--gd);color:var(--gold)}
-.btn-p:hover{background:rgba(200,184,154,.14)}
-.btn-gen{width:100%;padding:16px;background:transparent;border:1px solid var(--gd);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:4px;color:var(--gold);cursor:pointer;transition:all .28s;margin-top:10px}
-.btn-gen:hover{background:rgba(200,184,154,.06)}
-.prev-card{background:linear-gradient(135deg,#181818,#0f0f0f);border:.5px solid var(--border);border-radius:12px;padding:24px 20px;margin-top:24px;position:relative}
-.prev-card::before{content:'PREVIEW';position:absolute;top:12px;right:14px;font-size:8px;letter-spacing:3px;color:rgba(200,184,154,.16)}
-.pv-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;letter-spacing:3px;color:var(--text)}
-.pv-role{font-size:9px;letter-spacing:4px;color:var(--gd);margin-top:5px;margin-bottom:16px}
-.pv-div{width:16px;height:.5px;background:var(--gold);margin-bottom:16px;opacity:.55}
-.pv-info{font-size:9px;letter-spacing:1.5px;color:rgba(200,184,154,.3);line-height:2.2;white-space:pre-line}
-.pv-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
-.pv-chip{font-size:8px;letter-spacing:1.5px;color:rgba(200,184,154,.28);border:.5px solid rgba(200,184,154,.1);border-radius:10px;padding:3px 9px}
-.err{font-size:9px;letter-spacing:2px;color:rgba(220,80,80,.65);margin-top:6px;display:none}
-.err.show{display:block}
-.loverlay{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999}
-.loverlay.show{display:flex}
-.lspin{width:44px;height:44px;border:1px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1.1s linear infinite;margin-bottom:20px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ltxt{font-size:9px;letter-spacing:5px;color:var(--gd);animation:pulse 1.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
-@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+:root {
+  --gold: #c8b89a;
+  --gd: rgba(200,184,154,0.45);
+  --gf: rgba(200,184,154,0.08);
+  --bg: #070707;
+  --border: rgba(200,184,154,0.09);
+  --text: #f0e8dc;
+  --text-dim: rgba(240,232,220,0.55);
+}
 
-/* ── CARD SCREEN ── */
-#card-screen{display:none}
-#card-screen.show{display:block}
-.nav{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:16px 24px;z-index:100;background:rgba(7,7,7,0.92);backdrop-filter:blur(16px);border-bottom:.5px solid var(--border)}
-.nlogo{font-size:10px;letter-spacing:4px;color:var(--gd)}
-.ntabs{display:flex;gap:2px;background:rgba(255,255,255,.03);border-radius:24px;padding:3px}
-.ntab{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:2px;padding:7px 14px;border:none;border-radius:20px;cursor:pointer;transition:all .25s;background:transparent;color:rgba(200,184,154,.38)}
-.ntab.on{background:rgba(200,184,154,.12);color:var(--gold)}
-.nedit{font-size:8px;letter-spacing:3px;color:rgba(200,184,154,.25);cursor:pointer;background:none;border:none;font-family:'Josefin Sans',sans-serif;transition:color .2s}
-.nedit:hover{color:var(--gd)}
-.page{display:none;padding-top:65px;min-height:100vh;animation:pin .4s ease}
-.page.on{display:block}
-@keyframes pin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.hero{position:relative;min-height:380px;display:flex;align-items:flex-end;padding:52px 28px 40px;overflow:hidden}
-.hbg{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 0%,rgba(200,184,154,.05) 0%,transparent 55%),linear-gradient(180deg,#141414 0%,var(--bg) 100%)}
-.hlv{position:absolute;left:28px;top:40px;bottom:40px;width:1px;background:linear-gradient(180deg,transparent,var(--gold),transparent);opacity:.3}
-.hc{position:relative;z-index:1;padding-left:16px}
-.hey{font-size:8px;letter-spacing:6px;color:rgba(200,184,154,.28);margin-bottom:10px;animation:fu .8s .1s both}
-.hname{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;line-height:.95;letter-spacing:2px;color:var(--text);animation:fu .8s .2s both}
-.hrole{font-size:9px;letter-spacing:5px;color:var(--gd);margin-top:12px;animation:fu .8s .3s both}
-.hstress{margin-top:24px;animation:fu .8s .4s both}
-.hsl{font-size:8px;letter-spacing:3px;color:rgba(200,184,154,.2);margin-bottom:7px}
-.str-track{width:120px;height:1.5px;background:rgba(255,255,255,.05);border-radius:1px;position:relative}
-.str-fill{height:100%;background:var(--gold);border-radius:1px;transition:width 1.1s ease}
-.str-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);position:absolute;top:-2.5px;transition:left 1.1s ease}
-@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.sec{padding:40px 28px;border-top:.5px solid var(--border)}
-.sl{font-size:8px;letter-spacing:5px;color:rgba(200,184,154,.28);margin-bottom:8px}
-.sln{width:18px;height:1px;background:var(--gold);margin-bottom:20px;opacity:.5}
-.atext{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:300;font-style:italic;line-height:1.9;color:rgba(240,232,220,.6);max-width:420px}
-.wbox{margin-top:20px;padding:16px 18px;background:rgba(200,184,154,.04);border:.5px solid rgba(200,184,154,.08);border-left:2px solid rgba(200,184,154,.2);border-radius:0 8px 8px 0}
-.wlabel{font-size:7px;letter-spacing:4px;color:rgba(200,184,154,.25);margin-bottom:7px}
-.wtext{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(240,232,220,.4);line-height:1.95}
-.clist{display:flex;flex-direction:column}
-.crow{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:.5px solid var(--border);cursor:pointer;transition:padding-left .2s;text-decoration:none;color:inherit}
-.crow:hover{padding-left:5px}
-.cicn{width:34px;height:34px;border:.5px solid rgba(200,184,154,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.cinfo{flex:1}
-.clabel{font-size:8px;letter-spacing:3px;color:rgba(200,184,154,.28);margin-bottom:3px}
-.cval{font-size:11px;letter-spacing:1.5px;color:rgba(200,184,154,.6)}
-.savebtn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:16px;background:transparent;border:1px solid rgba(200,184,154,.25);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:4px;color:var(--gd);cursor:pointer;transition:all .25s}
-.savebtn:hover,.savebtn:active{background:rgba(200,184,154,.05);color:var(--gold)}
-.pcard{background:rgba(255,255,255,.02);border:.5px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px}
-.art{width:100%;aspect-ratio:16/9;border-radius:8px;background:linear-gradient(135deg,#1a1a1a,#0e0e0e);margin-bottom:16px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer}
-.art-canvas{position:absolute;inset:0;width:100%;height:100%}
-.art-overlay{position:absolute;bottom:12px;left:14px;font-size:8px;letter-spacing:4px;color:rgba(200,184,154,.33);pointer-events:none}
-.art-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:3px;color:rgba(200,184,154,.28);pointer-events:none;transition:opacity .3s}
-.tname{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--text);margin-bottom:3px}
-.tartist{font-size:9px;letter-spacing:3px;color:rgba(200,184,154,.33);margin-bottom:18px}
-.prog{width:100%;height:1.5px;background:rgba(255,255,255,.06);border-radius:1px;cursor:pointer;position:relative;margin-bottom:5px}
-.pfill{height:100%;background:var(--gold);border-radius:1px;position:relative;transition:width .08s linear}
-.pdot{width:10px;height:10px;background:var(--gold);border-radius:50%;position:absolute;right:-5px;top:-4.5px}
-.trow{display:flex;justify-content:space-between;font-size:8px;color:rgba(200,184,154,.25);margin-bottom:20px}
-.ctrls{display:flex;align-items:center;justify-content:center;gap:20px}
-.cb{background:none;border:none;cursor:pointer;color:rgba(200,184,154,.33);font-size:16px;transition:color .2s;padding:5px}
-.cb:hover{color:var(--gold)}
-.pb{width:52px;height:52px;border:1px solid var(--gd);border-radius:50%;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--gold);transition:all .25s}
-.pb:hover,.pb:active{background:rgba(200,184,154,.1)}
-.vol-row{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:.5px solid var(--border)}
-.vol-lbl{font-size:12px;color:rgba(200,184,154,.28)}
-input[type=range].vol{-webkit-appearance:none;flex:1;height:1.5px;background:rgba(255,255,255,.06);border-radius:1px;outline:none;border:none;padding:0;cursor:pointer}
-input[type=range].vol::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer}
-.plist{display:flex;flex-direction:column;gap:2px}
-.pli{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;cursor:pointer;transition:background .18s}
-.pli:hover{background:rgba(255,255,255,.02)}
-.pli.on{background:rgba(200,184,154,.05)}
-.pthumb{width:36px;height:36px;background:linear-gradient(135deg,#2a2a2a,#181818);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:rgba(200,184,154,.16)}
-.pinfo{flex:1}
-.ptitle{font-size:11px;letter-spacing:1px;color:rgba(240,232,220,.75);margin-bottom:2px}
-.psub{font-size:8px;letter-spacing:2px;color:rgba(200,184,154,.28)}
-.pact{font-size:13px;color:rgba(200,184,154,.2)}
-.pli.on .pact{color:var(--gold)}
-.mood-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(200,184,154,.05);border:.5px solid rgba(200,184,154,.13);border-radius:20px;font-size:9px;letter-spacing:2px;color:var(--gd);margin-bottom:18px}
-.cardsec{display:flex;flex-direction:column;align-items:center;padding:44px 24px 60px}
-.biz-front{width:100%;max-width:320px;background:linear-gradient(135deg,#1c1c1c,#111);border:.5px solid rgba(200,184,154,.07);border-radius:14px;padding:28px 22px;aspect-ratio:1.75;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:10px}
-.biz-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;letter-spacing:3px;color:var(--text);line-height:1.05}
-.biz-role{font-size:7px;letter-spacing:4px;color:var(--gd);margin-top:5px}
-.biz-div{width:14px;height:.5px;background:var(--gold);margin:12px 0;opacity:.5}
-.biz-info{font-size:7px;letter-spacing:1.5px;color:rgba(200,184,154,.28);line-height:2.2}
-.biz-back{width:100%;max-width:320px;background:linear-gradient(135deg,#141414,#0e0e0e);border:.5px solid rgba(200,184,154,.05);border-radius:14px;aspect-ratio:1.75;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
-.share-btn{width:100%;max-width:320px;padding:15px;background:transparent;border:1px solid rgba(200,184,154,.25);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:4px;color:var(--gd);cursor:pointer;transition:all .25s;margin-bottom:10px}
-.share-btn:hover,.share-btn:active{background:rgba(200,184,154,.05);color:var(--gold)}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(200,184,154,.1);border:.5px solid rgba(200,184,154,.2);backdrop-filter:blur(12px);border-radius:24px;padding:10px 24px;font-size:9px;letter-spacing:2px;color:var(--gold);transition:transform .32s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.footer{text-align:center;padding:32px;font-size:8px;letter-spacing:2px;color:rgba(200,184,154,.12);border-top:.5px solid var(--border)}
+html, body { min-height: 100%; overflow-x: hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Josefin Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 28px;
+  z-index: 100;
+  background: rgba(7,7,7,0.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--border);
+}
+.nlogo {
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: rgba(200,184,154,0.5);
+  font-weight: 200;
+}
+.ntabs {
+  display: flex; gap: 2px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 24px;
+  padding: 3px;
+}
+.ntab {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 8px;
+  letter-spacing: 2.5px;
+  padding: 8px 16px;
+  border: none; border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: transparent;
+  color: rgba(200,184,154,0.35);
+  font-weight: 300;
+}
+.ntab.on {
+  background: rgba(200,184,154,0.11);
+  color: var(--gold);
+}
+
+/* ── PAGES ── */
+.page { display: none; padding-top: 68px; min-height: 100vh; animation: pin 0.45s ease; }
+.page.on { display: block; }
+@keyframes pin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 440px;
+  display: flex; align-items: flex-end;
+  padding: 64px 36px 52px;
+  overflow: hidden;
+}
+.hbg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 80% 10%, rgba(200,184,154,0.05) 0%, transparent 50%),
+    linear-gradient(175deg, #161616 0%, #0a0a0a 40%, var(--bg) 100%);
+}
+.hlv {
+  position: absolute; left: 36px; top: 48px; bottom: 48px;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, rgba(200,184,154,0.5) 40%, rgba(200,184,154,0.2) 100%);
+}
+.hc { position: relative; z-index: 1; padding-left: 22px; }
+
+.hey {
+  font-size: 8px;
+  letter-spacing: 7px;
+  color: rgba(200,184,154,0.3);
+  margin-bottom: 16px;
+  font-weight: 200;
+  animation: fu 0.9s 0.1s both;
+}
+.hname {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 56px;
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: 3px;
+  color: var(--text);
+  animation: fu 0.9s 0.2s both;
+}
+.hrole {
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: rgba(200,184,154,0.4);
+  margin-top: 18px;
+  font-weight: 200;
+  animation: fu 0.9s 0.3s both;
+}
+@keyframes fu { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── SECTIONS ── */
+.sec {
+  padding: 52px 36px;
+  border-top: 0.5px solid var(--border);
+}
+.sec-label {
+  font-size: 8px;
+  letter-spacing: 6px;
+  color: rgba(200,184,154,0.28);
+  margin-bottom: 10px;
+  font-weight: 200;
+}
+.sec-line {
+  width: 20px; height: 1px;
+  background: rgba(200,184,154,0.45);
+  margin-bottom: 28px;
+}
+
+/* ── ABOUT ── */
+.about-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 21px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 2.0;
+  color: rgba(240,232,220,0.55);
+  max-width: 400px;
+  letter-spacing: 0.3px;
+}
+
+/* ── CONTACT LIST ── */
+.clist { display: flex; flex-direction: column; }
+.crow {
+  display: flex; align-items: center; gap: 20px;
+  padding: 22px 0;
+  border-bottom: 0.5px solid var(--border);
+  text-decoration: none; color: inherit;
+  transition: padding-left 0.22s, opacity 0.22s;
+  cursor: pointer;
+}
+.crow:hover { padding-left: 8px; opacity: 0.8; }
+.crow:last-child { border-bottom: none; }
+.cicn {
+  width: 38px; height: 38px;
+  border: 0.5px solid rgba(200,184,154,0.14);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: rgba(200,184,154,0.45);
+}
+.cicn svg { width: 15px; height: 15px; stroke-width: 1.5; }
+.cinfo { flex: 1; }
+.clabel {
+  font-size: 8px;
+  letter-spacing: 3.5px;
+  color: rgba(200,184,154,0.28);
+  margin-bottom: 5px;
+  font-weight: 200;
+}
+.cval {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: rgba(200,184,154,0.65);
+  font-weight: 300;
+}
+
+/* ── SAVE BUTTON ── */
+.savebtn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 18px;
+  background: transparent;
+  border: 0.5px solid rgba(200,184,154,0.22);
+  border-radius: 10px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 9px; letter-spacing: 4px;
+  color: rgba(200,184,154,0.45);
+  cursor: pointer; transition: all 0.25s;
+  font-weight: 300;
+}
+.savebtn svg { width: 13px; height: 13px; stroke-width: 1.5; }
+.savebtn:hover, .savebtn:active {
+  background: rgba(200,184,154,0.04);
+  color: var(--gold);
+  border-color: rgba(200,184,154,0.38);
+}
+
+/* ── MUSIC PLAYER ── */
+.pcard {
+  background: rgba(255,255,255,0.018);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.art {
+  width: 100%; aspect-ratio: 16/9;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #181818, #0d0d0d);
+  margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.art-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.art-lbl {
+  position: absolute; bottom: 14px; left: 16px;
+  font-size: 8px; letter-spacing: 4px;
+  color: rgba(200,184,154,0.3);
+  pointer-events: none;
+  font-weight: 200;
+}
+.art-hint {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(200,184,154,0.25);
+  pointer-events: none; transition: opacity 0.3s;
+}
+.tname {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 400;
+  color: var(--text); margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.tartist {
+  font-size: 9px; letter-spacing: 3px;
+  color: rgba(200,184,154,0.3);
+  margin-bottom: 22px; font-weight: 200;
+}
+.prog {
+  width: 100%; height: 1.5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 1px; cursor: pointer;
+  position: relative; margin-bottom: 6px;
+}
+.pfill {
+  height: 100%; background: var(--gold);
+  border-radius: 1px; position: relative;
+  transition: width 0.08s linear;
+}
+.pdot {
+  width: 10px; height: 10px;
+  background: var(--gold); border-radius: 50%;
+  position: absolute; right: -5px; top: -4.5px;
+}
+.trow {
+  display: flex; justify-content: space-between;
+  font-size: 8px; letter-spacing: 1px;
+  color: rgba(200,184,154,0.22);
+  margin-bottom: 24px;
+}
+.ctrls {
+  display: flex; align-items: center; justify-content: center; gap: 24px;
+}
+.cb {
+  background: none; border: none; cursor: pointer;
+  color: rgba(200,184,154,0.3); transition: color 0.2s; padding: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+.cb svg { width: 18px; height: 18px; stroke-width: 1.5; }
+.cb:hover { color: var(--gold); }
+.pb {
+  width: 54px; height: 54px;
+  border: 1px solid rgba(200,184,154,0.4);
+  border-radius: 50%; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold); transition: all 0.25s;
+}
+.pb svg { width: 18px; height: 18px; stroke-width: 1.5; }
+.pb:hover, .pb:active { background: rgba(200,184,154,0.08); }
+.vol-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 20px; padding-top: 16px;
+  border-top: 0.5px solid var(--border);
+}
+.vol-icn { color: rgba(200,184,154,0.28); display: flex; }
+.vol-icn svg { width: 14px; height: 14px; stroke-width: 1.5; }
+input[type=range].vol {
+  -webkit-appearance: none; flex: 1;
+  height: 1.5px; background: rgba(255,255,255,0.06);
+  border-radius: 1px; outline: none; border: none; padding: 0; cursor: pointer;
+}
+input[type=range].vol::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--gold); cursor: pointer;
+}
+
+/* ── PLAYLIST ── */
+.plist { display: flex; flex-direction: column; gap: 2px; }
+.pli {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 12px; border-radius: 10px;
+  cursor: pointer; transition: background 0.18s;
+}
+.pli:hover { background: rgba(255,255,255,0.02); }
+.pli.on { background: rgba(200,184,154,0.05); }
+.pthumb {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, #222, #161616);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: rgba(200,184,154,0.18);
+}
+.pthumb svg { width: 14px; height: 14px; stroke-width: 1.2; }
+.pinfo { flex: 1; }
+.ptitle {
+  font-size: 11px; letter-spacing: 1.5px;
+  color: rgba(240,232,220,0.75); margin-bottom: 4px;
+  font-weight: 300;
+}
+.psub { font-size: 8px; letter-spacing: 2px; color: rgba(200,184,154,0.28); font-weight: 200; }
+.pact { color: rgba(200,184,154,0.22); display: flex; }
+.pact svg { width: 14px; height: 14px; stroke-width: 1.5; }
+.pli.on .pact { color: var(--gold); }
+.mood-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px;
+  background: rgba(200,184,154,0.05);
+  border: 0.5px solid rgba(200,184,154,0.13);
+  border-radius: 20px;
+  font-size: 9px; letter-spacing: 2.5px;
+  color: rgba(200,184,154,0.45);
+  margin-bottom: 22px; font-weight: 200;
+}
+.mood-badge svg { width: 12px; height: 12px; stroke-width: 1.5; }
+
+/* ── CARD PAGE ── */
+.cardsec {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 52px 28px 72px;
+}
+.biz-front {
+  width: 100%; max-width: 340px;
+  background: linear-gradient(140deg, #1e1e1e 0%, #111 100%);
+  border: 0.5px solid rgba(200,184,154,0.07);
+  border-radius: 16px; padding: 32px 28px;
+  aspect-ratio: 1.75; display: flex; flex-direction: column; justify-content: flex-end;
+  margin-bottom: 12px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.biz-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 300; letter-spacing: 3px;
+  color: var(--text); line-height: 1.15;
+}
+.biz-role {
+  font-size: 7px; letter-spacing: 4px;
+  color: rgba(200,184,154,0.4); margin-top: 6px; font-weight: 200;
+}
+.biz-div { width: 16px; height: 0.5px; background: var(--gold); margin: 14px 0; opacity: 0.5; }
+.biz-info {
+  font-size: 8px; letter-spacing: 1.5px;
+  color: rgba(200,184,154,0.28); line-height: 2.4; font-weight: 200;
+}
+.biz-back {
+  width: 100%; max-width: 340px;
+  background: linear-gradient(140deg, #141414, #0d0d0d);
+  border: 0.5px solid rgba(200,184,154,0.05);
+  border-radius: 16px; aspect-ratio: 1.75;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 32px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.action-btn {
+  width: 100%; max-width: 340px; padding: 17px;
+  background: transparent;
+  border: 0.5px solid rgba(200,184,154,0.2);
+  border-radius: 10px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 9px; letter-spacing: 4px;
+  color: rgba(200,184,154,0.4);
+  cursor: pointer; transition: all 0.25s;
+  margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-weight: 300;
+}
+.action-btn svg { width: 13px; height: 13px; stroke-width: 1.5; }
+.action-btn:hover, .action-btn:active {
+  background: rgba(200,184,154,0.04);
+  color: var(--gold); border-color: rgba(200,184,154,0.35);
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: rgba(200,184,154,0.08);
+  border: 0.5px solid rgba(200,184,154,0.2);
+  backdrop-filter: blur(16px);
+  border-radius: 24px; padding: 11px 26px;
+  font-size: 9px; letter-spacing: 2px;
+  color: var(--gold);
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 9999; white-space: nowrap; font-weight: 300;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.footer {
+  text-align: center; padding: 36px 28px;
+  font-size: 8px; letter-spacing: 3px;
+  color: rgba(200,184,154,0.1);
+  border-top: 0.5px solid var(--border);
+  font-weight: 200;
+}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     SETUP SCREEN
-══════════════════════════════════════════ -->
-<div id="setup-screen">
-  <div class="su-hdr">
-    <div class="su-sub">DIGITAL CARD GENERATOR</div>
-    <div class="su-title">나만의<br>디지털 명함</div>
-    <div class="su-line"></div>
-  </div>
-
-  <div class="steps">
-    <div class="sdot active" id="d1">01</div><div class="sline" id="l1"></div>
-    <div class="sdot" id="d2">02</div><div class="sline" id="l2"></div>
-    <div class="sdot" id="d3">03</div><div class="sline" id="l3"></div>
-    <div class="sdot" id="d4">04</div>
-  </div>
-
-  <!-- STEP 1 -->
-  <div class="su-card on" id="s1" style="max-width:580px">
-    <div class="ctitle">STEP 01</div>
-    <div class="chead">기본 정보</div>
-    <div class="row2">
-      <div><label>이름</label><input type="text" id="f-name" placeholder="홍길동"/></div>
-      <div><label>나이</label><input type="number" id="f-age" placeholder="24" min="18" max="60"/></div>
-    </div>
-    <div class="row"><label>전공 / 직무 목표</label><input type="text" id="f-major" placeholder="UX 디자인, 마케팅, 개발 등"/></div>
-    <div class="row"><label>한 줄 자기소개</label><input type="text" id="f-intro" placeholder="경험으로 가치를 만드는 사람"/></div>
-    <div class="row"><label>연락처 (선택)</label><input type="tel" id="f-phone" placeholder="+82 10 0000 0000"/></div>
-    <div class="row"><label>이메일 (선택)</label><input type="email" id="f-email" placeholder="you@example.com"/></div>
-    <div class="err" id="e1">이름과 자기소개를 입력해주세요</div>
-    <div class="brow"><button class="btn btn-p" onclick="go(2)">다음 →</button></div>
-  </div>
-
-  <!-- STEP 2 -->
-  <div class="su-card" id="s2" style="max-width:580px">
-    <div class="ctitle">STEP 02</div>
-    <div class="chead">음악 취향</div>
-    <div class="row">
-      <label>좋아하는 장르 (복수 선택)</label>
-      <div class="chips">
-        <div class="chip" onclick="tc(this,'g')">Lo-fi</div><div class="chip" onclick="tc(this,'g')">인디</div>
-        <div class="chip" onclick="tc(this,'g')">재즈</div><div class="chip" onclick="tc(this,'g')">R&amp;B</div>
-        <div class="chip" onclick="tc(this,'g')">클래식</div><div class="chip" onclick="tc(this,'g')">팝</div>
-        <div class="chip" onclick="tc(this,'g')">힙합</div><div class="chip" onclick="tc(this,'g')">일렉트로닉</div>
-        <div class="chip" onclick="tc(this,'g')">어쿠스틱</div><div class="chip" onclick="tc(this,'g')">OST</div>
-      </div>
-    </div>
-    <div class="row">
-      <label>언제 주로 듣나요?</label>
-      <div class="chips">
-        <div class="chip" onclick="tc(this,'s')">공부할 때</div><div class="chip" onclick="tc(this,'s')">운동할 때</div>
-        <div class="chip" onclick="tc(this,'s')">출퇴근</div><div class="chip" onclick="tc(this,'s')">잠들기 전</div>
-        <div class="chip" onclick="tc(this,'s')">스트레스 해소</div><div class="chip" onclick="tc(this,'s')">기분 전환</div>
-      </div>
-    </div>
-    <div class="row"><label>좋아하는 아티스트</label><input type="text" id="f-artists" placeholder="IU, NewJeans, Frank Ocean..."/></div>
-    <div class="brow">
-      <button class="btn btn-s" onclick="go(1)">← 이전</button>
-      <button class="btn btn-p" onclick="go(3)">다음 →</button>
-    </div>
-  </div>
-
-  <!-- STEP 3 -->
-  <div class="su-card" id="s3" style="max-width:580px">
-    <div class="ctitle">STEP 03</div>
-    <div class="chead">지금 나의 상태</div>
-    <div class="row">
-      <label>오늘의 스트레스 레벨</label>
-      <div class="sval" id="sv">65</div>
-      <input type="range" min="0" max="100" value="65" id="f-stress" oninput="document.getElementById('sv').textContent=this.value"/>
-      <div class="slabs"><span>✦ 평온</span><span>폭발 직전 ✦</span></div>
-    </div>
-    <div class="row" style="margin-top:26px">
-      <label>지금 기분은?</label>
-      <div class="mgrid">
-        <button class="mbtn on" onclick="sm(this,'calm')"><span class="mi">🌊</span>고요한</button>
-        <button class="mbtn" onclick="sm(this,'melancholy')"><span class="mi">🌧</span>우울한</button>
-        <button class="mbtn" onclick="sm(this,'focused')"><span class="mi">🔥</span>집중된</button>
-        <button class="mbtn" onclick="sm(this,'tired')"><span class="mi">🍂</span>지친</button>
-        <button class="mbtn" onclick="sm(this,'excited')"><span class="mi">⚡</span>설레는</button>
-        <button class="mbtn" onclick="sm(this,'anxious')"><span class="mi">🌀</span>불안한</button>
-      </div>
-    </div>
-    <div class="row" style="margin-top:20px">
-      <label>취업 고민 / 하고 싶은 말 (선택)</label>
-      <textarea id="f-worry" placeholder="요즘 포트폴리오 준비 중인데 방향을 못 잡겠어요..."></textarea>
-    </div>
-    <div class="brow">
-      <button class="btn btn-s" onclick="go(2)">← 이전</button>
-      <button class="btn btn-p" onclick="go(4)">다음 →</button>
-    </div>
-  </div>
-
-  <!-- STEP 4 -->
-  <div class="su-card" id="s4" style="max-width:580px">
-    <div class="ctitle">STEP 04</div>
-    <div class="chead">확인 &amp; 생성</div>
-    <div class="prev-card">
-      <div class="pv-name" id="pv-n">YOUR NAME</div>
-      <div class="pv-role" id="pv-r">ROLE</div>
-      <div class="pv-div"></div>
-      <div class="pv-info" id="pv-i">—</div>
-      <div class="pv-chips" id="pv-c"></div>
-    </div>
-    <button class="btn-gen" onclick="generate()">✦ &nbsp; 명함 생성하기</button>
-    <div class="brow"><button class="btn btn-s" onclick="go(3)">← 이전</button></div>
+<!-- NAV -->
+<div class="nav">
+  <div class="nlogo">SCH</div>
+  <div class="ntabs">
+    <button class="ntab on" onclick="pg('p')">PROFILE</button>
+    <button class="ntab" onclick="pg('m')">MUSIC</button>
+    <button class="ntab" onclick="pg('c')">CARD</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     CARD SCREEN
-══════════════════════════════════════════ -->
-<div id="card-screen">
-  <div class="nav">
-    <div class="nlogo" id="nlogo">—</div>
-    <div class="ntabs">
-      <button class="ntab on" onclick="pg('p')">PROFILE</button>
-      <button class="ntab" onclick="pg('m')">MUSIC</button>
-      <button class="ntab" onclick="pg('c')">CARD</button>
-    </div>
-    <button class="nedit" onclick="editProfile()">EDIT ✦</button>
-  </div>
-
-  <!-- PROFILE -->
-  <div class="page on" id="pg-p">
-    <div class="hero">
-      <div class="hbg"></div><div class="hlv"></div>
-      <div class="hc">
-        <div class="hey" id="c-eyebrow">DIGITAL PROFILE</div>
-        <div class="hname" id="c-name">—</div>
-        <div class="hrole" id="c-role">—</div>
-        <div class="hstress">
-          <div class="hsl" id="c-slabel">STRESS LEVEL · 0</div>
-          <div class="str-track">
-            <div class="str-fill" id="c-sfill" style="width:0%"></div>
-            <div class="str-dot" id="c-sdot" style="left:0%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="sec">
-      <div class="sl">ABOUT</div><div class="sln"></div>
-      <div class="atext" id="c-intro">—</div>
-      <div class="wbox" id="c-wbox" style="display:none">
-        <div class="wlabel">WHAT'S ON MY MIND</div>
-        <div class="wtext" id="c-worry">—</div>
-      </div>
-    </div>
-    <div class="sec" id="c-csec">
-      <div class="sl">CONTACT</div><div class="sln"></div>
-      <div class="clist" id="c-clist"></div>
-    </div>
-    <div class="sec"><button class="savebtn" onclick="saveVCard()">↓ &nbsp; 연락처 저장</button></div>
-    <div class="footer" id="c-footer">© 2025 — ALL RIGHTS RESERVED</div>
-  </div>
-
-  <!-- MUSIC -->
-  <div class="page" id="pg-m">
-    <div class="sec">
-      <div class="sl">CURATED FOR YOUR MOOD</div><div class="sln"></div>
-      <div class="mood-badge" id="c-mbadge">🌊 고요한</div>
-      <div class="pcard">
-        <div class="art" onclick="togglePlay()">
-          <canvas class="art-canvas" id="viz"></canvas>
-          <div class="art-overlay" id="albl">—</div>
-          <div class="art-hint" id="ahint">▶ 탭하여 재생</div>
-        </div>
-        <div class="tname" id="tname">—</div>
-        <div class="tartist" id="tartist">—</div>
-        <div class="prog" onclick="seek(event,this)">
-          <div class="pfill" id="pf" style="width:0%"><div class="pdot"></div></div>
-        </div>
-        <div class="trow"><span id="ct">0:00</span><span id="tt">3:00</span></div>
-        <div class="ctrls">
-          <button class="cb" onclick="prevT()">⏮</button>
-          <button class="pb" id="playbtn" onclick="togglePlay()">▶</button>
-          <button class="cb" onclick="nextT()">⏭</button>
-        </div>
-        <div class="vol-row">
-          <span class="vol-lbl">🔈</span>
-          <input type="range" class="vol" min="0" max="1" step="0.01" value="0.6" oninput="setVol(this.value)">
-          <span class="vol-lbl">🔊</span>
-        </div>
-      </div>
-      <div class="sl" style="margin-bottom:10px">PLAYLIST</div>
-      <div class="plist" id="plist"></div>
+<!-- ── PROFILE ── -->
+<div class="page on" id="pg-p">
+  <div class="hero">
+    <div class="hbg"></div>
+    <div class="hlv"></div>
+    <div class="hc">
+      <div class="hey">DIGITAL PROFILE · 2025</div>
+      <div class="hname">순천향<br>미랩</div>
+      <div class="hrole">SOONCHUNHYANG MELAB</div>
     </div>
   </div>
 
-  <!-- CARD -->
-  <div class="page" id="pg-c">
-    <div class="cardsec">
-      <div class="biz-front">
-        <div>
-          <div class="biz-name" id="biz-name">—</div>
-          <div class="biz-role" id="biz-role">—</div>
-          <div class="biz-div"></div>
-          <div class="biz-info" id="biz-info">—</div>
+  <div class="sec">
+    <div class="sec-label">ABOUT</div>
+    <div class="sec-line"></div>
+    <div class="about-text">
+      경험을 통해 가치를 만들고,<br>
+      사람들의 일상에 영감을 더합니다.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">CONTACT</div>
+    <div class="sec-line"></div>
+    <div class="clist">
+      <a class="crow" href="tel:01012345678">
+        <div class="cicn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        </div>
+        <div class="cinfo">
+          <div class="clabel">PHONE</div>
+          <div class="cval">010-1234-5678</div>
+        </div>
+      </a>
+      <div class="crow">
+        <div class="cicn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="cinfo">
+          <div class="clabel">LOCATION</div>
+          <div class="cval">순천향 미랩</div>
         </div>
       </div>
-      <div class="biz-back">
-        <div style="font-size:7px;letter-spacing:3px;color:rgba(200,184,154,.14);text-align:center">DIGITAL CARD</div>
-      </div>
-      <button class="share-btn" onclick="shareCard()">↗ &nbsp; 이 페이지 공유하기</button>
-      <button class="share-btn" onclick="saveVCard()">↓ &nbsp; 연락처 저장 (.vcf)</button>
     </div>
+  </div>
+
+  <div class="sec">
+    <button class="savebtn" onclick="saveVCard()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      CONTACT SAVE
+    </button>
+  </div>
+
+  <div class="footer">© 2025 SOONCHUNHYANG MELAB · ALL RIGHTS RESERVED</div>
+</div>
+
+<!-- ── MUSIC ── -->
+<div class="page" id="pg-m">
+  <div class="sec">
+    <div class="sec-label">CURATED MUSIC</div>
+    <div class="sec-line"></div>
+    <div class="mood-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      집중 &amp; 힐링
+    </div>
+
+    <div class="pcard">
+      <div class="art" onclick="togglePlay()">
+        <canvas class="art-canvas" id="viz"></canvas>
+        <div class="art-lbl" id="albl">QUIET HOURS</div>
+        <div class="art-hint" id="ahint">탭하여 재생</div>
+      </div>
+      <div class="tname" id="tname">Quiet Hours</div>
+      <div class="tartist">순천향 미랩</div>
+      <div class="prog" onclick="seek(event,this)">
+        <div class="pfill" id="pf" style="width:0%"><div class="pdot"></div></div>
+      </div>
+      <div class="trow"><span id="ct">0:00</span><span id="tt">3:00</span></div>
+      <div class="ctrls">
+        <button class="cb" onclick="prevT()" title="이전">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+        </button>
+        <button class="pb" id="playbtn" onclick="togglePlay()">
+          <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+        <button class="cb" onclick="nextT()" title="다음">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+        </button>
+      </div>
+      <div class="vol-row">
+        <div class="vol-icn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
+        </div>
+        <input type="range" class="vol" min="0" max="1" step="0.01" value="0.6" oninput="setVol(this.value)">
+        <div class="vol-icn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label" style="margin-bottom:12px">PLAYLIST</div>
+    <div class="plist" id="plist"></div>
   </div>
 </div>
 
-<!-- Loading -->
-<div class="loverlay" id="lv">
-  <div class="lspin"></div>
-  <div class="ltxt" id="lmsg">GENERATING YOUR CARD</div>
+<!-- ── CARD ── -->
+<div class="page" id="pg-c">
+  <div class="cardsec">
+    <div class="biz-front">
+      <div>
+        <div class="biz-name">순천향<br>미랩</div>
+        <div class="biz-role">SOONCHUNHYANG MELAB</div>
+        <div class="biz-div"></div>
+        <div class="biz-info">010-1234-5678<br>순천향 미랩</div>
+      </div>
+    </div>
+    <div class="biz-back">
+      <div style="text-align:center;font-size:7px;letter-spacing:4px;color:rgba(200,184,154,0.12);font-weight:200;line-height:2">DIGITAL CARD<br>순천향 미랩</div>
+    </div>
+    <button class="action-btn" onclick="saveVCard()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      CONTACT SAVE
+    </button>
+    <button class="action-btn" onclick="shareCard()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      SHARE
+    </button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════
-//  데이터
-// ═══════════════════════════════════════
-const SEL={g:[],s:[]};
-let MOOD='calm';
-let PROFILE={};
-
-const MOOD_MUSIC={
-  calm:    {name:'고요한',   icon:'🌊', bpm:60,  tracks:[{t:'Quiet Hours',chord:[261.63,329.63,392.00],scale:[261.63,293.66,329.63,349.23,392.00,440.00],pad:true, bass:true, arp:false},{t:'Still Waters',chord:[220.00,277.18,329.63],scale:[220.00,246.94,277.18,293.66,329.63,369.99],pad:true,bass:true,arp:true},{t:'Morning Mist',chord:[174.61,220.00,261.63],scale:[174.61,195.99,220.00,246.94,261.63,293.66],pad:true,bass:false,arp:true}]},
-  melancholy:{name:'우울한', icon:'🌧', bpm:52,  tracks:[{t:'Blue November',chord:[233.08,277.18,349.23],scale:[233.08,261.63,277.18,311.13,349.23,369.99],pad:true,bass:true,arp:false},{t:'Empty Room',chord:[196.00,233.08,293.66],scale:[196.00,220.00,233.08,261.63,293.66,311.13],pad:true,bass:true,arp:false},{t:'Fading Light',chord:[174.61,207.65,261.63],scale:[174.61,196.00,207.65,233.08,261.63,277.18],pad:true,bass:false,arp:true}]},
-  focused:  {name:'집중된',  icon:'🔥', bpm:80,  tracks:[{t:'Deep Work',chord:[261.63,329.63,440.00],scale:[261.63,293.66,329.63,392.00,440.00,493.88],pad:false,bass:true,arp:true},{t:'Flow State',chord:[293.66,369.99,466.16],scale:[293.66,329.63,369.99,415.30,466.16,523.25],pad:false,bass:true,arp:true},{t:'Momentum',chord:[220.00,293.66,369.99],scale:[220.00,261.63,293.66,329.63,369.99,415.30],pad:true,bass:true,arp:true}]},
-  tired:    {name:'지친',    icon:'🍂', bpm:46,  tracks:[{t:'Slow Burn',chord:[196.00,233.08,277.18],scale:[196.00,207.65,233.08,261.63,277.18,311.13],pad:true,bass:true,arp:false},{t:'Rest Here',chord:[174.61,207.65,246.94],scale:[174.61,185.00,207.65,220.00,246.94,261.63],pad:true,bass:false,arp:false},{t:'Gentle Wave',chord:[155.56,185.00,233.08],scale:[155.56,174.61,185.00,207.65,233.08,246.94],pad:true,bass:true,arp:false}]},
-  excited:  {name:'설레는',  icon:'⚡', bpm:100, tracks:[{t:'Electric Sky',chord:[329.63,415.30,493.88],scale:[329.63,369.99,415.30,440.00,493.88,554.37],pad:false,bass:true,arp:true},{t:'Golden Hour',chord:[293.66,369.99,493.88],scale:[293.66,329.63,369.99,440.00,493.88,523.25],pad:false,bass:true,arp:true},{t:'Rise Up',chord:[261.63,349.23,440.00],scale:[261.63,293.66,349.23,392.00,440.00,523.25],pad:true,bass:true,arp:true}]},
-  anxious:  {name:'불안한',  icon:'🌀', bpm:58,  tracks:[{t:'Breathe Again',chord:[246.94,293.66,349.23],scale:[246.94,261.63,293.66,311.13,349.23,392.00],pad:true,bass:true,arp:true},{t:'Soft Landing',chord:[220.00,261.63,329.63],scale:[220.00,246.94,261.63,293.66,329.63,349.23],pad:true,bass:true,arp:false},{t:'Let It Go',chord:[196.00,246.94,293.66],scale:[196.00,220.00,246.94,261.63,293.66,329.63],pad:true,bass:false,arp:true}]}
-};
-
-// ═══════════════════════════════════════
-//  SETUP 로직
-// ═══════════════════════════════════════
-function go(n){
-  if(n===2){
-    const nm=document.getElementById('f-name').value.trim();
-    const intro=document.getElementById('f-intro').value.trim();
-    const e=document.getElementById('e1');
-    if(!nm||!intro){e.classList.add('show');return;}
-    e.classList.remove('show');
-  }
-  for(let i=1;i<=4;i++){
-    const d=document.getElementById('d'+i);
-    d.classList.remove('active','done');
-    if(i<n)d.classList.add('done');
-    else if(i===n)d.classList.add('active');
-    document.getElementById('s'+i).classList.toggle('on',i===n);
-    if(i<=3)document.getElementById('l'+i).classList.toggle('done',i<n);
-  }
-  if(n===4)buildPreview();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function tc(el,g){
-  el.classList.toggle('on');
-  const v=el.textContent.trim(), a=SEL[g], i=a.indexOf(v);
-  if(i===-1)a.push(v); else a.splice(i,1);
-}
-
-function sm(el,m){
-  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on'); MOOD=m;
-}
-
-function buildPreview(){
-  const name=document.getElementById('f-name').value.trim()||'YOUR NAME';
-  const age=document.getElementById('f-age').value.trim();
-  const major=document.getElementById('f-major').value.trim();
-  const intro=document.getElementById('f-intro').value.trim();
-  const phone=document.getElementById('f-phone').value.trim();
-  const email=document.getElementById('f-email').value.trim();
-  document.getElementById('pv-n').textContent=name.toUpperCase();
-  document.getElementById('pv-r').textContent=[major,age?age+'세':''].filter(Boolean).join(' · ').toUpperCase()||'PROFILE';
-  let info=intro; if(phone)info+='\n'+phone; if(email)info+='\n'+email;
-  document.getElementById('pv-i').textContent=info;
-  const pc=document.getElementById('pv-c'); pc.innerHTML='';
-  [...SEL.g,...SEL.s].slice(0,6).forEach(g=>{const d=document.createElement('div');d.className='pv-chip';d.textContent=g;pc.appendChild(d);});
-}
-
-const LMSGS=['DESIGNING YOUR CARD','CURATING YOUR MUSIC','CRAFTING THE AESTHETIC','ALMOST READY'];
-async function generate(){
-  const lv=document.getElementById('lv'), lm=document.getElementById('lmsg');
-  lv.classList.add('show');
-  let mi=0; const t=setInterval(()=>{mi=(mi+1)%LMSGS.length;lm.textContent=LMSGS[mi];},700);
-  PROFILE={
-    name:document.getElementById('f-name').value.trim(),
-    age:document.getElementById('f-age').value.trim(),
-    major:document.getElementById('f-major').value.trim(),
-    intro:document.getElementById('f-intro').value.trim(),
-    phone:document.getElementById('f-phone').value.trim(),
-    email:document.getElementById('f-email').value.trim(),
-    artists:document.getElementById('f-artists').value.trim(),
-    genres:[...SEL.g], situations:[...SEL.s],
-    stress:document.getElementById('f-stress').value,
-    mood:MOOD, worry:document.getElementById('f-worry').value.trim()
-  };
-  // localStorage에 저장 (수정 후 돌아올 때 복원)
-  try{localStorage.setItem('dcard_profile',JSON.stringify(PROFILE));}catch(e){}
-  await new Promise(r=>setTimeout(r,1800));
-  clearInterval(t); lv.classList.remove('show');
-  showCard();
-}
-
-function editProfile(){
-  // 저장된 데이터로 폼 복원
-  restoreForm();
-  document.getElementById('card-screen').classList.remove('show');
-  document.getElementById('card-screen').style.display='none';
-  document.getElementById('setup-screen').classList.remove('hide');
-  go(1);
-}
-
-function restoreForm(){
-  const p=PROFILE;
-  if(!p.name)return;
-  document.getElementById('f-name').value=p.name||'';
-  document.getElementById('f-age').value=p.age||'';
-  document.getElementById('f-major').value=p.major||'';
-  document.getElementById('f-intro').value=p.intro||'';
-  document.getElementById('f-phone').value=p.phone||'';
-  document.getElementById('f-email').value=p.email||'';
-  document.getElementById('f-artists').value=p.artists||'';
-  document.getElementById('f-stress').value=p.stress||65;
-  document.getElementById('sv').textContent=p.stress||65;
-  if(p.mood){document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('on'));const mb=document.querySelector(`.mbtn[onclick*="${p.mood}"]`);if(mb)mb.classList.add('on');MOOD=p.mood;}
-  if(p.genres)p.genres.forEach(g=>{document.querySelectorAll('.chip').forEach(c=>{if(c.textContent.trim()===g&&c.onclick?.toString().includes("'g'")){c.classList.add('on');if(!SEL.g.includes(g))SEL.g.push(g);}});});
-  if(p.situations)p.situations.forEach(s=>{document.querySelectorAll('.chip').forEach(c=>{if(c.textContent.trim()===s&&c.onclick?.toString().includes("'s'")){c.classList.add('on');if(!SEL.s.includes(s))SEL.s.push(s);}});});
-  if(p.worry)document.getElementById('f-worry').value=p.worry;
-}
-
-// ═══════════════════════════════════════
-//  CARD 화면
-// ═══════════════════════════════════════
-function showCard(){
-  document.getElementById('setup-screen').classList.add('hide');
-  const cs=document.getElementById('card-screen');
-  cs.style.display='block'; cs.classList.add('show');
-  const p=PROFILE;
-  const name=p.name||'—';
-  const age=p.age?p.age+'세':'';
-  const major=p.major||'';
-  const role=[major,age].filter(Boolean).join(' · ').toUpperCase();
-  document.getElementById('nlogo').textContent=name.slice(0,2).toUpperCase();
-  document.getElementById('c-name').textContent=name.toUpperCase();
-  document.getElementById('c-role').textContent=role||'PROFILE';
-  document.getElementById('c-eyebrow').textContent='DIGITAL PROFILE · '+new Date().getFullYear();
-  const sv=parseInt(p.stress)||0;
-  document.getElementById('c-slabel').textContent='STRESS LEVEL · '+sv;
-  setTimeout(()=>{
-    document.getElementById('c-sfill').style.width=sv+'%';
-    document.getElementById('c-sdot').style.left='calc('+sv+'% - 3px)';
-  },300);
-  document.getElementById('c-intro').textContent=p.intro||'—';
-  if(p.worry){document.getElementById('c-wbox').style.display='block';document.getElementById('c-worry').textContent=p.worry;}
-  const cl=document.getElementById('c-clist'); cl.innerHTML='';
-  const contacts=[];
-  if(p.phone)contacts.push({i:'📞',l:'PHONE',v:p.phone,href:'tel:'+p.phone.replace(/\s/g,'')});
-  if(p.email)contacts.push({i:'✉',l:'EMAIL',v:p.email,href:'mailto:'+p.email});
-  if(!contacts.length)document.getElementById('c-csec').style.display='none';
-  contacts.forEach(c=>{cl.innerHTML+=`<a class="crow" href="${c.href}"><div class="cicn">${c.i}</div><div class="cinfo"><div class="clabel">${c.l}</div><div class="cval">${c.v}</div></div></a>`;});
-  document.getElementById('c-footer').textContent='© '+new Date().getFullYear()+' '+name.toUpperCase()+' · ALL RIGHTS RESERVED';
-  document.getElementById('biz-name').textContent=name.toUpperCase();
-  document.getElementById('biz-role').textContent=role||'';
-  const bi=[]; if(p.phone)bi.push(p.phone); if(p.email)bi.push(p.email);
-  document.getElementById('biz-info').innerHTML=bi.join('<br>')||'—';
-  // Music
-  const md=MOOD_MUSIC[p.mood||'calm'];
-  document.getElementById('c-mbadge').textContent=md.icon+' '+md.name;
-  initMusicTracks(md, name);
-}
-
-function pg(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
-  document.getElementById('pg-'+id).classList.add('on');
+// ── 네비 ─────────────────────────────────────────────────────
+function pg(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
   document.querySelectorAll('.ntab')[{p:0,m:1,c:2}[id]].classList.add('on');
 }
 
-// ═══════════════════════════════════════
-//  Web Audio
-// ═══════════════════════════════════════
-let AC=null,masterGain=null,analyser=null,currentNodes=[],playing=false,progSec=0,progTimer=null,ci=0,trackDur=180,TRACKS=[];
+// ── Web Audio ─────────────────────────────────────────────────
+let AC=null, masterGain=null, analyser=null;
+let currentNodes=[], playing=false, progSec=0, progTimer=null, ci=0;
+const trackDur = 180;
 
-function initAudio(){if(AC)return;AC=new(window.AudioContext||window.webkitAudioContext)();masterGain=AC.createGain();masterGain.gain.value=0.6;analyser=AC.createAnalyser();analyser.fftSize=256;masterGain.connect(analyser);analyser.connect(AC.destination);}
+const TRACKS = [
+  { t:'Quiet Hours',  chord:[261.63,329.63,392.00], scale:[261.63,293.66,329.63,349.23,392.00,440.00], pad:true,  bass:true,  arp:false },
+  { t:'Still Waters', chord:[220.00,277.18,329.63], scale:[220.00,246.94,277.18,293.66,329.63,369.99], pad:true,  bass:true,  arp:true  },
+  { t:'Morning Mist', chord:[174.61,220.00,261.63], scale:[174.61,195.99,220.00,246.94,261.63,293.66], pad:true,  bass:false, arp:true  },
+];
 
-function stopAll(){currentNodes.forEach(n=>{try{n.stop()}catch(e){}});currentNodes=[];}
+function initAudio() {
+  if (AC) return;
+  AC = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = AC.createGain(); masterGain.gain.value = 0.6;
+  analyser = AC.createAnalyser(); analyser.fftSize = 256;
+  masterGain.connect(analyser); analyser.connect(AC.destination);
+}
 
-function playAudio(td){
-  if(!AC)return; stopAll();
-  const now=AC.currentTime,beatSec=60/(MOOD_MUSIC[PROFILE.mood||'calm'].bpm||60);
-  const totalBars=Math.ceil(trackDur/(beatSec*4));
-  function osc(f,type,st,dur,vol,det=0){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;if(det)o.detune.value=det;o.connect(g);g.connect(masterGain);g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(vol,st+0.08);g.gain.linearRampToValueAtTime(vol*0.7,st+dur*0.5);g.gain.linearRampToValueAtTime(0,st+dur);o.start(st);o.stop(st+dur+0.1);currentNodes.push(o);}
-  function noise(st,dur,vol){const buf=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.15;const src=AC.createBufferSource(),g=AC.createGain(),filt=AC.createBiquadFilter();filt.type='bandpass';filt.frequency.value=200;src.buffer=buf;src.connect(filt);filt.connect(g);g.connect(masterGain);g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(vol,st+0.02);g.gain.linearRampToValueAtTime(0,st+dur);src.start(st);src.stop(st+dur+0.05);currentNodes.push(src);}
-  for(let b=0;b<totalBars;b++){
-    const bt=now+b*beatSec*4;
-    if(td.pad)td.chord.forEach((f,i)=>{osc(f/2,'sine',bt,beatSec*4-.1,0.18-i*0.04);osc(f,'sine',bt,beatSec*4-.1,0.09-i*0.03,4);});
-    if(td.bass){osc(td.chord[0]/2,'triangle',bt,beatSec*.9,0.22);osc(td.chord[0]/2,'triangle',bt+beatSec*2,beatSec*.9,0.22);}
-    if(td.arp){const an=[...td.scale,td.scale[td.scale.length-1]*1.5];[0,2,4,3,5,4,2,1].forEach((ni,si)=>{osc(an[ni%an.length],'triangle',bt+si*beatSec*0.5,beatSec*0.35,0.11);});}
-    if(b%2===0){noise(bt,0.08,0.28);noise(bt+beatSec*2,0.06,0.18);}
+function stopAll() { currentNodes.forEach(n => { try { n.stop(); } catch(e){} }); currentNodes = []; }
+
+function playAudio(td) {
+  if (!AC) return; stopAll();
+  const now = AC.currentTime, beatSec = 1.0;
+  const totalBars = Math.ceil(trackDur / (beatSec * 4));
+  function osc(f, type, st, dur, vol, det=0) {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.value = f; if (det) o.detune.value = det;
+    o.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(0, st);
+    g.gain.linearRampToValueAtTime(vol, st+0.08);
+    g.gain.linearRampToValueAtTime(vol*0.7, st+dur*0.5);
+    g.gain.linearRampToValueAtTime(0, st+dur);
+    o.start(st); o.stop(st+dur+0.1); currentNodes.push(o);
+  }
+  function noise(st, dur, vol) {
+    const buf = AC.createBuffer(1, AC.sampleRate*dur, AC.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i=0; i<d.length; i++) d[i] = (Math.random()*2-1)*0.15;
+    const src = AC.createBufferSource(), g = AC.createGain(), filt = AC.createBiquadFilter();
+    filt.type='bandpass'; filt.frequency.value=200;
+    src.buffer=buf; src.connect(filt); filt.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(vol,st+0.02); g.gain.linearRampToValueAtTime(0,st+dur);
+    src.start(st); src.stop(st+dur+0.05); currentNodes.push(src);
+  }
+  for (let b=0; b<totalBars; b++) {
+    const bt = now + b*beatSec*4;
+    if (td.pad) td.chord.forEach((f,i) => { osc(f/2,'sine',bt,beatSec*4-.1,0.18-i*0.04); osc(f,'sine',bt,beatSec*4-.1,0.09-i*0.03,4); });
+    if (td.bass) { osc(td.chord[0]/2,'triangle',bt,beatSec*.9,0.22); osc(td.chord[0]/2,'triangle',bt+beatSec*2,beatSec*.9,0.22); }
+    if (td.arp) { const an=[...td.scale,td.scale[td.scale.length-1]*1.5]; [0,2,4,3,5,4,2,1].forEach((ni,si)=>{ osc(an[ni%an.length],'triangle',bt+si*beatSec*0.5,beatSec*0.35,0.11); }); }
+    if (b%2===0) { noise(bt,0.08,0.28); noise(bt+beatSec*2,0.06,0.18); }
   }
 }
 
-function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function fmt(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
 
-function startTimer(){
+function startTimer() {
   clearInterval(progTimer);
-  progTimer=setInterval(()=>{
-    if(!playing)return;
-    progSec++; if(progSec>=trackDur){nextT();return;}
-    document.getElementById('pf').style.width=(progSec/trackDur*100)+'%';
-    document.getElementById('ct').textContent=fmt(progSec);
-  },1000);
+  progTimer = setInterval(() => {
+    if (!playing) return;
+    progSec++;
+    if (progSec >= trackDur) { nextT(); return; }
+    document.getElementById('pf').style.width = (progSec/trackDur*100) + '%';
+    document.getElementById('ct').textContent = fmt(progSec);
+  }, 1000);
 }
 
-function togglePlay(){
-  initAudio(); if(AC.state==='suspended')AC.resume();
-  playing=!playing;
-  document.getElementById('playbtn').textContent=playing?'⏸':'▶';
-  document.getElementById('ahint').style.opacity=playing?'0':'0.7';
-  if(playing){playAudio(TRACKS[ci]);startTimer();}else{stopAll();clearInterval(progTimer);}
+const playIconSVG  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+const pauseIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+
+function togglePlay() {
+  initAudio();
+  if (AC.state === 'suspended') AC.resume();
+  playing = !playing;
+  document.getElementById('playbtn').innerHTML = playing ? pauseIconSVG : playIconSVG;
+  document.getElementById('ahint').style.opacity = playing ? '0' : '0.7';
+  if (playing) { playAudio(TRACKS[ci]); startTimer(); }
+  else { stopAll(); clearInterval(progTimer); }
 }
 
-function loadTrack(i,auto){
-  if(playing){stopAll();clearInterval(progTimer);playing=false;}
-  ci=i;progSec=0;
-  document.getElementById('pf').style.width='0%';
-  document.getElementById('ct').textContent='0:00';
-  document.getElementById('tname').textContent=TRACKS[i].t;
-  document.getElementById('albl').textContent=TRACKS[i].t.toUpperCase();
-  document.getElementById('tartist').textContent=(PROFILE.name||'—').toUpperCase();
-  document.getElementById('playbtn').textContent='▶';
-  document.getElementById('ahint').style.opacity='0.7';
+function loadTrack(i, auto) {
+  if (playing) { stopAll(); clearInterval(progTimer); playing = false; }
+  ci = i; progSec = 0;
+  document.getElementById('pf').style.width = '0%';
+  document.getElementById('ct').textContent = '0:00';
+  document.getElementById('tname').textContent = TRACKS[i].t;
+  document.getElementById('albl').textContent = TRACKS[i].t.toUpperCase();
+  document.getElementById('playbtn').innerHTML = playIconSVG;
+  document.getElementById('ahint').style.opacity = '0.7';
   buildPlist();
-  if(auto){playing=false;togglePlay();}
+  if (auto) { playing = false; togglePlay(); }
 }
 
-function nextT(){loadTrack((ci+1)%TRACKS.length,true);}
-function prevT(){loadTrack((ci-1+TRACKS.length)%TRACKS.length,playing);}
-function seek(e,el){const r=el.getBoundingClientRect();progSec=Math.floor(((e.clientX-r.left)/r.width)*trackDur);document.getElementById('pf').style.width=(progSec/trackDur*100)+'%';if(playing){stopAll();playAudio(TRACKS[ci]);}}
-function setVol(v){if(masterGain)masterGain.gain.value=parseFloat(v);}
-
-function initMusicTracks(md,name){
-  TRACKS=md.tracks; trackDur=Math.round(60/md.bpm*4*16);
-  loadTrack(0,false); drawViz();
+function nextT() { loadTrack((ci+1) % TRACKS.length, true); }
+function prevT() { loadTrack((ci-1+TRACKS.length) % TRACKS.length, playing); }
+function seek(e, el) {
+  const r = el.getBoundingClientRect();
+  progSec = Math.floor(((e.clientX - r.left) / r.width) * trackDur);
+  document.getElementById('pf').style.width = (progSec/trackDur*100) + '%';
+  if (playing) { stopAll(); playAudio(TRACKS[ci]); }
 }
+function setVol(v) { if (masterGain) masterGain.gain.value = parseFloat(v); }
 
-function buildPlist(){
-  const pl=document.getElementById('plist');pl.innerHTML='';
-  TRACKS.forEach((t,i)=>{
-    const d=document.createElement('div');d.className='pli'+(i===ci?' on':'');d.onclick=()=>loadTrack(i,true);
-    d.innerHTML=`<div class="pthumb">◈</div><div class="pinfo"><div class="ptitle">${t.t.toUpperCase()}</div><div class="psub">${fmt(trackDur)}</div></div><div class="pact">${i===ci?'▌▌':'▶'}</div>`;
+function buildPlist() {
+  const pl = document.getElementById('plist'); pl.innerHTML = '';
+  TRACKS.forEach((t, i) => {
+    const d = document.createElement('div');
+    d.className = 'pli' + (i===ci ? ' on' : '');
+    d.onclick = () => loadTrack(i, true);
+    const icon = i === ci
+      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>`;
+    d.innerHTML = `
+      <div class="pthumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+      <div class="pinfo"><div class="ptitle">${t.t.toUpperCase()}</div><div class="psub">3:00</div></div>
+      <div class="pact">${icon}</div>`;
     pl.appendChild(d);
   });
 }
 
-function drawViz(){
+// ── 비주얼라이저 ─────────────────────────────────────────────
+function drawViz() {
   requestAnimationFrame(drawViz);
-  if(!analyser)return;
-  const canvas=document.getElementById('viz');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width=canvas.offsetWidth,H=canvas.height=canvas.offsetHeight;
-  const data=new Uint8Array(analyser.frequencyBinCount);
+  if (!analyser) return;
+  const canvas = document.getElementById('viz');
+  if (!canvas || !canvas.offsetWidth) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.offsetWidth;
+  const H = canvas.height = canvas.offsetHeight;
+  const data = new Uint8Array(analyser.frequencyBinCount);
   analyser.getByteFrequencyData(data);
-  ctx.clearRect(0,0,W,H);
-  if(playing){const avg=data.reduce((a,b)=>a+b,0)/data.length;ctx.fillStyle=`rgba(200,184,154,${(avg/255)*0.07})`;ctx.fillRect(0,0,W,H);}
-  const n=44,bw=W/n-1.2;
-  for(let i=0;i<n;i++){
-    const v=playing?(data[Math.floor(i*data.length/n)]/255):(0.04+Math.sin(Date.now()/2200+i*0.28)*0.035);
-    const h=Math.max(2,v*H*0.7),x=i*(bw+1.2),a=playing?(0.18+v*0.5):0.07;
-    ctx.fillStyle=`rgba(200,184,154,${a})`;ctx.fillRect(x,H-h,bw,h);
+  ctx.clearRect(0, 0, W, H);
+  if (playing) {
+    const avg = data.reduce((a,b)=>a+b,0)/data.length;
+    ctx.fillStyle = `rgba(200,184,154,${(avg/255)*0.06})`;
+    ctx.fillRect(0,0,W,H);
+  }
+  const n = 48, bw = W/n - 1.5;
+  for (let i=0; i<n; i++) {
+    const v = playing ? (data[Math.floor(i*data.length/n)]/255) : (0.03 + Math.sin(Date.now()/2400+i*0.3)*0.03);
+    const h = Math.max(2, v*H*0.72);
+    const x = i * (bw + 1.5);
+    const a = playing ? (0.15 + v*0.5) : 0.06;
+    ctx.fillStyle = `rgba(200,184,154,${a})`;
+    ctx.beginPath();
+    ctx.roundRect(x, H-h, bw, h, 1.5);
+    ctx.fill();
   }
 }
 
-// ═══════════════════════════════════════
-//  유틸
-// ═══════════════════════════════════════
-function saveVCard(){
-  const p=PROFILE;
-  const vc=['BEGIN:VCARD','VERSION:3.0',
-    `FN:${p.name||''}`, `ORG:${p.major||''}`,
-    p.phone?`TEL:${p.phone.replace(/[\s\-]/g,'')}`:null,
-    p.email?`EMAIL:${p.email}`:null,
-    'END:VCARD'].filter(Boolean).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([vc],{type:'text/vcard'}));
-  a.download=(p.name||'contact')+'.vcf'; a.click();
-  showToast('연락처 저장 완료 ✦');
+// ── 유틸 ─────────────────────────────────────────────────────
+function saveVCard() {
+  const vc = ['BEGIN:VCARD','VERSION:3.0','FN:순천향 미랩','ORG:순천향 미랩','TEL:01012345678','ADR:;;순천향 미랩;;;;Korea','END:VCARD'].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([vc],{type:'text/vcard'}));
+  a.download = '순천향_미랩.vcf'; a.click();
+  showToast('연락처가 저장되었습니다');
+}
+function shareCard() {
+  if (navigator.share) { navigator.share({title:'순천향 미랩 디지털 명함', url: location.href}); }
+  else { navigator.clipboard.writeText(location.href).then(()=>showToast('링크가 복사되었습니다')); }
+}
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-function shareCard(){
-  if(navigator.share){navigator.share({title:(PROFILE.name||'')+'디지털 명함',url:location.href});}
-  else{navigator.clipboard.writeText(location.href).then(()=>showToast('링크가 복사되었습니다 ✦'));}
-}
-
-function showToast(msg){
-  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2800);
-}
-
-// ── 시작: localStorage에 저장된 프로필 있으면 바로 명함으로 ──
-window.addEventListener('load',()=>{
-  try{
-    const saved=localStorage.getItem('dcard_profile');
-    if(saved){PROFILE=JSON.parse(saved);showCard();return;}
-  }catch(e){}
-  // 없으면 setup 화면 유지
-});
+buildPlist();
+drawViz();
 </script>
 </body>
 </html>
